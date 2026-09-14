@@ -262,42 +262,39 @@
   .focus span { font-size: 21px; line-height: 1.4; color: #dfe5ff; }
 
   /* ================= Organization ================= */
-  .org-stats { position: absolute; right: 120px; top: 166px; display: flex; align-items: baseline; gap: 26px; }
-  .org-stats div { display: flex; align-items: baseline; gap: 12px; }
-  .org-stats b { font-family: var(--display); font-size: 76px; font-weight: 700; letter-spacing: -0.04em; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
-  .org-stats span { font-size: 26px; font-weight: 600; color: var(--mute); }
-  .org-stats i { width: 2px; height: 56px; background: var(--line); align-self: center; }
+  .org-stats { position: absolute; right: 120px; top: 178px; display: flex; gap: 18px; }
+  .org-stats .chip { background: var(--white); border: 1.5px solid var(--line); border-radius: 999px; padding: 14px 30px; font-size: 23px; font-weight: 600; color: var(--ink); box-shadow: 0 4px 14px rgba(6,13,51,.05); }
   .board {
-    position: relative; margin-top: 36px;
-    display: grid; grid-template-columns: 170px repeat(5, 1fr); align-items: center;
-    background: var(--navy); color: var(--white); border-radius: 22px; padding: 22px 40px;
+    position: relative; margin-top: 40px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: nowrap;
+    background: var(--navy); color: var(--white); border-radius: 20px; padding: 22px 30px;
   }
-  .board::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 30px; background: var(--brand); }
-  .board > h3 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -0.01em; border-right: 1.5px solid rgba(185,198,255,.3); height: 100%; display: flex; align-items: center; }
-  .board .seat { padding-left: 32px; display: flex; flex-direction: column; gap: 4px; }
-  .board .seat span { font-size: 16px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ice); }
-  .board .seat strong { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
-  .units { position: relative; margin-top: 56px; display: grid; grid-template-columns: repeat(5, 1fr) 1.42fr; gap: 28px; align-items: start; }
-  .ucol { position: relative; padding-top: 16px; border-top: 3px solid var(--brand); }
-  .ucol::before { content: ""; position: absolute; left: 24px; top: -29px; width: 2px; height: 26px; background: var(--brand); }
-  .ucol::after { content: ""; position: absolute; left: 24px; top: -29px; width: calc(100% + 28px); height: 2px; background: var(--brand); }
-  .ucol:last-child::after { display: none; }
-  .ucol .tap { position: absolute; left: 19px; top: -34px; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); z-index: 1; }
-  .ucol h3 { font-family: var(--display); font-weight: 700; font-size: 27px; line-height: 1.08; letter-spacing: -0.015em; color: var(--navy); min-height: 58px; padding-right: 44px; }
-  .ucol .head { margin-top: 10px; font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
-  .ucol ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .ucol li { font-size: 21px; line-height: 1.25; color: var(--ink); }
-  .ucol li small { display: block; font-size: 16px; color: var(--mute); margin-top: 2px; }
-  .ucol.academy { background: var(--white); border: 2px solid var(--line); border-top: 3px solid var(--navy); border-radius: 0 0 18px 18px; padding: 16px 22px 18px; }
-  .ucol.academy ul { gap: 9px; }
-  .step { position: absolute; right: 0; top: 14px; width: 36px; height: 36px; border-radius: 50%; background: var(--signal); color: var(--white); font-size: 18px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 6px rgba(82,113,255,.16); }
-  .ucol.lit { border-top-color: var(--signal); }
-  .event-flow { position: absolute; left: 120px; top: 770px; width: 1312px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 40px; padding: 30px 36px 32px; background: var(--white); border: 2px solid var(--line); border-radius: 22px; font-size: 22px; color: var(--ink); }
-  .event-flow > strong { grid-column: 1 / -1; font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--navy); letter-spacing: -0.01em; }
-  .event-flow .s { display: flex; align-items: flex-start; gap: 16px; position: relative; }
-  .event-flow .s span { display: flex; flex-direction: column; gap: 2px; line-height: 1.3; color: var(--mute); }
-  .event-flow .s b { font-weight: 600; font-size: 24px; color: var(--ink); }
-  .event-flow .s i { font-style: normal; width: 32px; height: 32px; border-radius: 50%; background: var(--signal); color: var(--white); font-size: 15px; font-weight: 700; display: grid; place-items: center; flex: none; }
+  .board::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 34px; background: var(--line); }
+  .board > h3 { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: .16em; text-transform: uppercase; margin-right: 6px; }
+  .board .seat { display: flex; align-items: baseline; gap: 12px; background: rgba(255,255,255,.09); border: 1.5px solid rgba(185,198,255,.32); border-radius: 999px; padding: 12px 22px; white-space: nowrap; }
+  .board .seat span { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ice); }
+  .board .seat strong { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .units { position: relative; margin-top: 66px; display: grid; grid-template-columns: repeat(5, 1fr) 1.32fr; gap: 26px; align-items: start; }
+  .ucard { position: relative; background: var(--white); border: 1.5px solid var(--line); border-radius: 16px; box-shadow: 0 12px 32px rgba(6,13,51,.07); }
+  .ucard::before { content: ""; position: absolute; left: 50%; top: -34px; width: 2px; height: 34px; background: var(--line); }
+  .ucard::after { content: ""; position: absolute; left: 50%; top: -34px; width: calc(100% + 26px); height: 2px; background: var(--line); }
+  .ucard:last-child::after { display: none; }
+  .ucard header { background: var(--navy); color: var(--white); text-align: center; padding: 20px 18px 18px; border-radius: 14px 14px 0 0; }
+  .ucard header h3 { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.12; letter-spacing: -0.01em; }
+  .ucard header p { margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--ice); }
+  .ucard ul { list-style: none; margin: 0; padding: 4px 22px 6px; }
+  .ucard li { padding: 9px 0; border-bottom: 1.5px solid var(--line); font-size: 19px; line-height: 1.25; color: var(--ink); }
+  .ucard li:last-child { border-bottom: 0; }
+  .ucard li small { display: block; font-size: 15px; color: var(--mute); margin-top: 3px; }
+
+  /* ================= How we build an event ================= */
+  .relay { position: absolute; left: 120px; right: 120px; top: 420px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; }
+  .rstep { position: relative; background: var(--white); border: 2px solid var(--line); border-radius: 26px; padding: 52px 48px 56px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 14px 36px rgba(6,13,51,.06); }
+  .rstep > i { font-style: normal; width: 64px; height: 64px; border-radius: 50%; background: var(--signal); color: var(--white); font-family: var(--display); font-size: 30px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 10px rgba(82,113,255,.14); }
+  .rstep h3 { font-family: var(--display); font-weight: 700; font-size: 42px; line-height: 1.1; letter-spacing: -0.02em; color: var(--navy); }
+  .rstep .who { font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
+  .rstep p { font-size: 26px; line-height: 1.45; color: var(--mute); }
+  .rstep:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -44px; width: 32px; height: 32px; border-top: 4px solid var(--signal); border-right: 4px solid var(--signal); transform: translateY(-50%) rotate(45deg); }
 
   /* ================= Expectations ================= */
   .exchange { position: absolute; left: 120px; right: 120px; top: 300px; bottom: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -654,46 +651,40 @@
     <section class="slide tone-light s-org" id="s-org" data-tone="light" data-part="03|The team" aria-label="The 2026/27 Organization">
       <h2 class="headline rv" style="--i:0">The 2026/27 Organization</h2>
       <div class="org-stats rv" style="--i:1">
-        <div><b>28</b><span>People</span></div><i aria-hidden="true"></i><div><b>7</b><span>Units</span></div>
+        <span class="chip">7 Units</span><span class="chip">28 People</span>
       </div>
 
       <div class="board rv" style="--i:2">
         <h3>Board</h3>
-        <div class="seat"><span>President</span><strong>Nicklas Hampe</strong></div>
-        <div class="seat"><span>Vice President</span><strong>Lucas Buch</strong></div>
-        <div class="seat"><span>Academy</span><strong>Darina Starodumova</strong></div>
-        <div class="seat"><span>Funding</span><strong>Oskar Bugge</strong></div>
-        <div class="seat"><span>Founder</span><strong>Oskar Bührmann</strong></div>
+        <div class="seat"><strong>Nicklas Hampe</strong><span>President</span></div>
+        <div class="seat"><strong>Lucas Buch</strong><span>Vice President</span></div>
+        <div class="seat"><strong>Darina Starodumova</strong><span>Academy</span></div>
+        <div class="seat"><strong>Oskar Bugge</strong><span>Funding</span></div>
+        <div class="seat"><strong>Oskar Bührmann</strong><span>Founder</span></div>
       </div>
 
       <div class="units">
-        <div class="ucol rv" style="--i:3"><i class="tap"></i>
-          <h3>People &amp; Organisation</h3>
-          <p class="head">Nic Philipps</p>
+        <div class="ucard rv" style="--i:3">
+          <header><h3>People &amp; Organisation</h3><p>Head · Nic Philipps</p></header>
         </div>
-        <div class="ucol rv" style="--i:4"><i class="tap"></i>
-          <h3>Funding</h3>
-          <p class="head">Oskar Bugge</p>
+        <div class="ucard rv" style="--i:4">
+          <header><h3>Funding</h3><p>Head · Oskar Bugge</p></header>
           <ul><li>Elias Ribe</li></ul>
         </div>
-        <div class="ucol lit rv" style="--i:5"><i class="tap"></i><span class="step" aria-label="Event step 1">1</span>
-          <h3>Partnerships</h3>
-          <p class="head">Lucas Buch</p>
+        <div class="ucard rv" style="--i:5">
+          <header><h3>Partnerships</h3><p>Head · Lucas Buch</p></header>
           <ul><li>Magnus Christoffersen</li><li>Isa Walsh</li><li>Anil Sahin</li><li>Mikkel Tufto-Antonsen</li></ul>
         </div>
-        <div class="ucol lit rv" style="--i:6"><i class="tap"></i><span class="step" aria-label="Event step 2">2</span>
-          <h3>Marketing &amp; Community</h3>
-          <p class="head">Sieun Lee</p>
+        <div class="ucard rv" style="--i:6">
+          <header><h3>Marketing &amp; Community</h3><p>Head · Sieun Lee</p></header>
           <ul><li>Ester</li><li>Alexander</li><li>Laurits</li><li>David</li></ul>
         </div>
-        <div class="ucol lit rv" style="--i:7"><i class="tap"></i><span class="step" aria-label="Event step 3">3</span>
-          <h3>Operations</h3>
-          <p class="head">Ellen Lansfjord</p>
+        <div class="ucard rv" style="--i:7">
+          <header><h3>Operations</h3><p>Head · Ellen Lansfjord</p></header>
           <ul><li>Vanessa Begovic</li><li>Natasha</li><li>Clara</li><li>William Munch Holst</li><li>Otto Nordraak</li></ul>
         </div>
-        <div class="ucol academy rv" style="--i:8"><i class="tap"></i>
-          <h3>Academy</h3>
-          <p class="head">Darina Starodumova</p>
+        <div class="ucard rv" style="--i:8">
+          <header><h3>Academy</h3><p>Head · Darina Starodumova</p></header>
           <ul>
             <li>Ahmad Al Wazani<small>Tech &amp; Knowledge</small></li>
             <li>Grzegorz Piotr Robaczyk<small>Programme &amp; Learning</small></li>
@@ -704,12 +695,28 @@
           </ul>
         </div>
       </div>
+    </section>
 
-      <div class="event-flow rv" style="--i:9">
-        <strong>How we build an event</strong>
-        <div class="s"><i>1</i><span><b>Partnerships</b>secures the industry speaker</span></div>
-        <div class="s"><i>2</i><span><b>Marketing</b>fills the room</span></div>
-        <div class="s"><i>3</i><span><b>Operations</b>executes on the floor</span></div>
+    <!-- 03 · How we build an event -->
+    <section class="slide tone-light s-event" id="s-event" data-tone="light" data-part="03|The team" aria-label="How We Build an Event">
+      <h2 class="headline rv" style="--i:0">How We Build an Event</h2>
+      <p class="lede rv" style="--i:1; margin-top: 24px">Three units, one relay — every event passes through the same hands.</p>
+      <div class="relay">
+        <div class="rstep rv" style="--i:2">
+          <i>1</i>
+          <h3>Partnerships</h3>
+          <p>Secures the industry speaker and builds the company relationship behind the event.</p>
+        </div>
+        <div class="rstep rv" style="--i:3">
+          <i>2</i>
+          <h3>Marketing &amp; Community</h3>
+          <p>Fills the room — campaigns, social media and outreach to the CBS community.</p>
+        </div>
+        <div class="rstep rv" style="--i:4">
+          <i>3</i>
+          <h3>Operations</h3>
+          <p>Executes on the floor — logistics, setup and the experience on the day.</p>
+        </div>
       </div>
     </section>
 
