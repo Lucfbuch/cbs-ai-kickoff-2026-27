@@ -297,13 +297,16 @@
   .org-foot { position: absolute; left: 120px; bottom: 66px; font-size: 17px; color: #9aa3b8; }
 
   /* ================= How we build an event ================= */
-  .relay { position: absolute; left: 120px; right: 120px; top: 420px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; }
-  .rstep { position: relative; background: var(--white); border: 2px solid var(--line); border-radius: 26px; padding: 52px 48px 56px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 14px 36px rgba(6,13,51,.06); }
-  .rstep > i { font-style: normal; width: 64px; height: 64px; border-radius: 50%; background: var(--signal); color: var(--white); font-family: var(--display); font-size: 30px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 10px rgba(82,113,255,.14); }
-  .rstep h3 { font-family: var(--display); font-weight: 700; font-size: 42px; line-height: 1.1; letter-spacing: -0.02em; color: var(--navy); }
-  .rstep .who { font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
-  .rstep p { font-size: 26px; line-height: 1.45; color: var(--mute); }
-  .rstep:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -44px; width: 32px; height: 32px; border-top: 4px solid var(--signal); border-right: 4px solid var(--signal); transform: translateY(-50%) rotate(45deg); }
+  .relay { position: absolute; left: 120px; right: 120px; top: 390px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 44px; }
+  .rstep { position: relative; background: var(--white); border: 2px solid var(--line); border-radius: 26px; padding: 42px 36px 46px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 14px 36px rgba(6,13,51,.06); }
+  .rstep > i { font-style: normal; width: 56px; height: 56px; border-radius: 50%; background: var(--signal); color: var(--white); font-family: var(--display); font-size: 27px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 9px rgba(82,113,255,.14); }
+  .rstep h3 { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; color: var(--navy); }
+  .rstep p { font-size: 23px; line-height: 1.45; color: var(--mute); }
+  .rstep:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -34px; width: 24px; height: 24px; border-top: 4px solid var(--signal); border-right: 4px solid var(--signal); transform: translateY(-50%) rotate(45deg); }
+  .loop { position: absolute; left: 120px; right: 120px; top: 830px; height: 180px; }
+  .loop svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .loop path { stroke: var(--signal); stroke-width: 3.5; fill: none; stroke-dasharray: 3 14; stroke-linecap: round; }
+  .loop text { font-family: var(--body); font-size: 24px; font-weight: 500; fill: var(--mute); }
 
   /* ================= Expectations ================= */
   .exchange { position: absolute; left: 120px; right: 120px; top: 300px; bottom: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -715,23 +718,39 @@
     <!-- 03 · How we build an event -->
     <section class="slide tone-light s-event" id="s-event" data-tone="light" data-part="03|The team" aria-label="How We Build an Event">
       <h2 class="headline rv" style="--i:0">How We Build an Event</h2>
-      <p class="lede rv" style="--i:1; margin-top: 24px">Three units, one relay — every event passes through the same hands.</p>
+      <p class="lede rv" style="--i:1; margin-top: 24px">Four units, one relay — every event passes through the same hands.</p>
       <div class="relay">
         <div class="rstep rv" style="--i:2">
           <i>1</i>
           <h3>Partnerships</h3>
-          <p>Secures the industry speaker and builds the company relationship behind the event.</p>
+          <p>Secures the industry speaker and the sponsorships each event needs — briefed by Operations on what is required.</p>
         </div>
         <div class="rstep rv" style="--i:3">
           <i>2</i>
-          <h3>Marketing &amp; Community</h3>
-          <p>Fills the room — campaigns, social media and outreach to the CBS community.</p>
+          <h3>Funding</h3>
+          <p>Steps in with the budget and financial backing that turn the plan into something we can run.</p>
         </div>
         <div class="rstep rv" style="--i:4">
           <i>3</i>
+          <h3>Marketing &amp; Community</h3>
+          <p>Fills the room — campaigns, social media and outreach to the CBS community.</p>
+        </div>
+        <div class="rstep rv" style="--i:5">
+          <i>4</i>
           <h3>Operations</h3>
           <p>Executes on the floor — logistics, setup and the experience on the day.</p>
         </div>
+      </div>
+      <div class="loop rv" style="--i:6" aria-hidden="true">
+        <svg viewBox="0 0 1680 180" preserveAspectRatio="none">
+          <defs>
+            <marker id="loop-ah" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+              <path d="M1 1 L11 6 L1 11 Z" fill="#5271ff" stroke="none"/>
+            </marker>
+          </defs>
+          <path d="M 205 18 C 480 150, 1200 150, 1475 18" marker-start="url(#loop-ah)" marker-end="url(#loop-ah)"/>
+          <text x="840" y="160" text-anchor="middle">Constant back and forth — Operations briefs Partnerships on what each event needs</text>
+        </svg>
       </div>
     </section>
 
