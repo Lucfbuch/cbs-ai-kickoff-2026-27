@@ -1,0 +1,963 @@
+<title>CBS AI Kickoff 2026/27</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --night: #060d33;
+    --navy: #00167a;
+    --brand: #4967aa;
+    --signal: #5271ff;
+    --signal-soft: #8fa3ff;
+    --cobalt: #004aad;
+    --paper: #f4f6fc;
+    --white: #ffffff;
+    --ink: #0b1640;
+    --mute: #55618c;
+    --line: #d3dbf1;
+    --ice: #b9c6ff;
+    --display: "Inter Tight", "Inter", "Helvetica Neue", Arial, sans-serif;
+    --body: "Inter", "Helvetica Neue", Arial, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--night);
+    color: var(--ink);
+    font-family: var(--body);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Stage: a fixed 1920x1080 canvas scaled to the viewport ---------- */
+  .viewport { position: fixed; inset: 0; background: var(--night); }
+  .stage {
+    position: absolute; left: 50%; top: 50%;
+    width: 1920px; height: 1080px;
+    transform-origin: center center;
+    transform: translate(-50%, -50%) scale(var(--scale, .5));
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0; visibility: hidden;
+    transform: scale(1.015);
+    transition: opacity .7s ease, transform .9s cubic-bezier(.2,.7,.2,1), visibility 0s linear .7s;
+    padding: 150px 120px 120px;
+  }
+  .slide.is-active {
+    opacity: 1; visibility: visible; transform: none;
+    transition: opacity .7s ease, transform .9s cubic-bezier(.2,.7,.2,1), visibility 0s;
+  }
+  .slide.tone-dark { background: linear-gradient(160deg, var(--navy) 0%, #031064 38%, var(--night) 100%); color: var(--white); }
+  .slide.tone-light { background: var(--paper); }
+  .slide.tone-white { background: var(--white); }
+
+  .rv { opacity: 1; }
+  .is-active .rv { animation: rise .85s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 90ms + 180ms); }
+  @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+
+  .trace { stroke-dasharray: 1400; stroke-dashoffset: 0; }
+  .is-active .trace { animation: draw 2.4s cubic-bezier(.4,.1,.2,1) both; animation-delay: calc(var(--i, 0) * 120ms + 200ms); }
+  @keyframes draw { from { stroke-dashoffset: 1400; } }
+  .node-pop { transform-box: fill-box; transform-origin: center; }
+  .is-active .node-pop { animation: pop .6s cubic-bezier(.3,1.6,.5,1) both; animation-delay: calc(var(--i, 0) * 120ms + 1400ms); }
+  @keyframes pop { from { transform: scale(0); } }
+
+  /* ---------- Type ---------- */
+  h1, h2, h3, p { margin: 0; }
+  .headline {
+    font-family: var(--display); font-weight: 700;
+    font-size: 92px; line-height: 1.02; letter-spacing: -0.028em;
+    text-wrap: balance; color: var(--navy);
+  }
+  .tone-dark .headline { color: var(--white); }
+  .lede { font-size: 30px; line-height: 1.45; color: var(--mute); }
+  .tone-dark .lede { color: var(--ice); }
+
+  /* ---------- Chrome ---------- */
+  .chrome-top {
+    position: absolute; left: 120px; right: 120px; top: 52px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 5; pointer-events: none;
+    transition: opacity .5s ease;
+  }
+  .chrome-top img { height: 50px; width: auto; display: block; }
+  .chrome-top .logo-white { display: none; }
+  .chrome-top .part { font-size: 20px; font-weight: 500; letter-spacing: .02em; color: var(--mute); display: flex; align-items: center; gap: 14px; }
+  .chrome-top .part b { font-weight: 600; color: var(--signal); font-variant-numeric: tabular-nums; }
+  .stage[data-tone="dark"] .chrome-top .logo-white { display: block; }
+  .stage[data-tone="dark"] .chrome-top .logo-blue { display: none; }
+  .stage[data-tone="dark"] .chrome-top .part { color: var(--ice); }
+  .stage[data-tone="dark"] .chrome-top .part b { color: var(--signal-soft); }
+  .stage[data-chrome="off"] .chrome-top { opacity: 0; }
+
+  .chrome-bottom {
+    position: absolute; right: 120px; bottom: 44px; z-index: 6;
+    display: flex; align-items: center; gap: 22px;
+  }
+  .counter { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--mute); letter-spacing: .04em; }
+  .counter b { color: var(--navy); font-weight: 600; }
+  .stage[data-tone="dark"] .counter { color: var(--ice); }
+  .stage[data-tone="dark"] .counter b { color: var(--white); }
+  .nav-btn {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1.5px solid var(--line); background: transparent; color: var(--navy);
+    display: grid; place-items: center; cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s;
+  }
+  .nav-btn:hover { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .nav-btn:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+  .nav-btn:disabled { opacity: .3; cursor: default; background: transparent; color: inherit; }
+  .stage[data-tone="dark"] .nav-btn { border-color: rgba(185,198,255,.35); color: var(--white); }
+  .stage[data-tone="dark"] .nav-btn:hover:not(:disabled) { background: var(--white); color: var(--navy); border-color: var(--white); }
+  .nav-btn svg { width: 22px; height: 22px; }
+
+  .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: rgba(82,113,255,.14); z-index: 6; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--signal); transition: width .7s cubic-bezier(.2,.7,.2,1); }
+
+  /* ================= Title ================= */
+  .s-title { padding: 0; }
+  .s-title::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(900px 700px at 78% 42%, rgba(82,113,255,.34), transparent 70%);
+  }
+  .s-title .circuit { position: absolute; right: 0; top: 0; width: 1000px; height: 1080px; }
+  .s-title .content { position: absolute; left: 140px; top: 0; bottom: 0; width: 1080px; display: flex; flex-direction: column; justify-content: center; gap: 40px; }
+  .s-title .content img { width: 300px; height: auto; }
+  .s-title h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: 164px; line-height: .94; letter-spacing: -0.04em; color: var(--white);
+  }
+  .s-title h1 em { font-style: normal; color: var(--ice); }
+  .s-title .sub { font-size: 40px; font-weight: 500; color: var(--white); letter-spacing: -0.01em; display: flex; align-items: center; gap: 20px; }
+  .s-title .sub .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 6px rgba(82,113,255,.25); }
+  .s-title .tagline { font-size: 30px; color: var(--ice); margin-top: -18px; }
+  .s-title .foot {
+    position: absolute; left: 140px; bottom: 56px;
+    font-size: 20px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: rgba(185,198,255,.75);
+  }
+
+  /* ================= Agenda ================= */
+  .agenda { position: absolute; left: 120px; right: 120px; top: 50%; transform: translateY(-38%); display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px; }
+  .agenda::before { content: ""; position: absolute; left: 13px; right: 0; top: 13px; height: 2px; background: linear-gradient(90deg, var(--signal), var(--line)); }
+  .agenda button {
+    all: unset; box-sizing: border-box; cursor: pointer; position: relative;
+    display: flex; flex-direction: column; gap: 18px; padding: 64px 20px 28px 0;
+    border-radius: 18px; transition: transform .25s ease;
+  }
+  .agenda button::before { content: ""; position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--paper); border: 3px solid var(--signal); transition: background .2s; }
+  .agenda button:hover { transform: translateY(-4px); }
+  .agenda button:hover::before { background: var(--signal); }
+  .agenda button:focus-visible { outline: 3px solid var(--signal); outline-offset: 10px; }
+  .agenda .num { font-family: var(--display); font-weight: 700; font-size: 170px; line-height: .9; letter-spacing: -0.05em; color: #c7d1f0; font-variant-numeric: tabular-nums; transition: color .2s; }
+  .agenda button:hover .num { color: var(--signal); }
+  .agenda .ttl { font-family: var(--display); font-weight: 700; font-size: 48px; letter-spacing: -0.02em; color: var(--navy); line-height: 1.05; }
+  .agenda .dsc { font-size: 28px; line-height: 1.4; color: var(--mute); max-width: 22ch; }
+
+  /* ================= Purpose statement ================= */
+  .s-mission { padding: 0; }
+  .s-mission figure { position: absolute; right: 0; top: 0; bottom: 0; width: 720px; margin: 0; }
+  .s-mission figure img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 55%); mask-image: linear-gradient(90deg, transparent 0%, #000 55%); }
+  .s-mission figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6,13,51,.6), transparent 40%); }
+  .s-mission .content { position: absolute; left: 120px; top: 150px; bottom: 120px; width: 1060px; display: flex; flex-direction: column; justify-content: center; gap: 44px; }
+  .s-mission .statement { font-family: var(--display); font-weight: 700; font-size: 72px; line-height: 1.06; letter-spacing: -0.03em; text-wrap: balance; }
+  .s-mission .statement mark { background: none; color: var(--signal-soft); }
+  .s-mission .support { font-size: 32px; line-height: 1.5; color: var(--ice); max-width: 50ch; }
+  .s-mission .support strong { color: var(--white); font-weight: 600; }
+
+  /* ================= Purpose: bridging ================= */
+  .s-purpose .poles { position: absolute; left: 120px; right: 120px; top: 320px; display: grid; grid-template-columns: 1fr 220px 1fr; column-gap: 24px; align-items: stretch; }
+  .pole { display: flex; flex-direction: column; gap: 22px; padding-top: 8px; }
+  .pole-head { display: flex; align-items: center; gap: 20px; }
+  .pole-head svg { width: 56px; height: 56px; flex: none; }
+  .pole h3 { font-family: var(--display); font-weight: 700; font-size: 58px; letter-spacing: -0.025em; color: var(--navy); }
+  .pole .claim { font-size: 34px; line-height: 1.3; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; max-width: 30ch; }
+  .pole .lede { max-width: 34ch; text-wrap: balance; }
+  .pole.left { align-items: flex-end; text-align: right; }
+  .pole.left .pole-head { flex-direction: row-reverse; }
+  .poles .junction { position: relative; }
+  .poles .junction svg { position: absolute; left: 0; top: -10px; width: 220px; height: 400px; overflow: visible; }
+  .callout {
+    position: absolute; left: 120px; right: 120px; bottom: 150px;
+    background: var(--navy); color: var(--white); border-radius: 28px;
+    display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 72px;
+    padding: 52px 64px; overflow: hidden;
+  }
+  .callout::after { content: ""; position: absolute; right: -120px; top: -160px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, rgba(82,113,255,.45), transparent 70%); }
+  .callout .mark { font-family: var(--display); font-weight: 700; font-size: 96px; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; }
+  .callout .mark span { color: var(--signal); }
+  .callout .mark .x { color: var(--ice); font-weight: 500; padding: 0 .12em; }
+  .callout p { font-size: 34px; line-height: 1.38; color: #dfe5ff; position: relative; z-index: 1; max-width: 46ch; }
+  .callout p strong { color: var(--white); font-weight: 600; }
+
+  /* ================= What we do ================= */
+  .pillars { position: absolute; left: 120px; right: 120px; top: 300px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 64px; }
+  .pillar { display: flex; flex-direction: column; gap: 18px; padding-top: 34px; border-top: 2px solid var(--line); position: relative; }
+  .pillar::before { content: ""; position: absolute; left: 0; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+  .pillar svg { width: 64px; height: 64px; }
+  .pillar h3 { font-family: var(--display); font-weight: 700; font-size: 42px; letter-spacing: -0.02em; color: var(--navy); }
+  .pillar p { font-size: 28px; line-height: 1.4; color: var(--mute); }
+  .case {
+    position: absolute; left: 120px; right: 120px; bottom: 150px; height: 320px;
+    display: grid; grid-template-columns: 520px 1fr; grid-template-rows: minmax(0, 1fr); border-radius: 28px; overflow: hidden;
+    background: var(--navy); color: var(--white);
+  }
+  .case figure { margin: 0; position: relative; }
+  .case figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85); }
+  .case figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,22,122,0) 55%, rgba(0,22,122,1) 100%), linear-gradient(0deg, rgba(0,22,122,.35), rgba(0,22,122,.05)); }
+  .case .body { padding: 0 80px 0 72px; display: flex; flex-direction: column; justify-content: center; gap: 20px; min-height: 0; }
+  .case h3 { font-family: var(--display); font-weight: 700; font-size: 44px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 18px; }
+  .case h3 .tag { font-family: var(--body); font-size: 18px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--night); background: var(--ice); padding: 8px 14px; border-radius: 999px; }
+  .case blockquote { margin: 0; font-size: 30px; line-height: 1.42; color: #dfe5ff; max-width: 52ch; }
+
+  /* ================= Journey ================= */
+  .journey-legend { position: absolute; left: 120px; top: 300px; display: flex; gap: 32px; font-size: 20px; color: var(--ice); }
+  .journey-legend span { display: flex; align-items: center; gap: 12px; }
+  .journey-legend i { width: 16px; height: 16px; border-radius: 50%; }
+  .journey-legend .m { background: var(--signal); }
+  .journey-legend .e { border: 2.5px solid var(--ice); }
+  .tl { position: absolute; left: 120px; right: 120px; top: 318px; height: 360px; display: grid; grid-template-columns: repeat(16, 1fr); }
+  .tl::before { content: ""; position: absolute; left: 3.125%; width: 87.5%; top: 179px; height: 3px; background: linear-gradient(90deg, var(--signal), rgba(143,163,255,.6)); }
+  .tl::after { content: ""; position: absolute; left: 90.625%; width: 6.25%; top: 179px; border-top: 3px dashed rgba(185,198,255,.5); }
+  .tl-item { position: relative; }
+  .tl-node { position: absolute; left: 50%; top: 180px; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; background: var(--night); border: 3px solid var(--ice); z-index: 1; }
+  .tl-item.ms .tl-node { width: 30px; height: 30px; margin: -15px 0 0 -15px; background: var(--signal); border-color: var(--signal); box-shadow: 0 0 0 8px rgba(82,113,255,.22); }
+  .tl-item.next .tl-node { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: none; border: none; }
+  .tl-item.next .tl-node svg { width: 100%; height: 100%; display: block; }
+  .tl-label { position: absolute; left: 50%; transform: translateX(-50%); width: 190px; text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .tl-label.up { bottom: 212px; }
+  .tl-label.down { top: 214px; }
+  .tl-label::after { content: ""; position: absolute; left: 50%; width: 2px; height: 16px; background: rgba(185,198,255,.3); }
+  .tl-label.up::after { bottom: -24px; }
+  .tl-label.down::after { top: -24px; }
+  .tl-label time { font-size: 16px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(185,198,255,.7); font-variant-numeric: tabular-nums; }
+  .tl-label strong { font-size: 23px; font-weight: 500; line-height: 1.2; color: var(--white); text-wrap: balance; }
+  .tl-item.ms .tl-label strong { font-family: var(--display); font-size: 24px; font-weight: 700; color: var(--signal-soft); letter-spacing: -0.01em; }
+  .tl-item.next .tl-label strong { font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--white); }
+  .tl-item:first-child .tl-label { width: 140px; left: calc(50% - 15px); transform: none; text-align: left; align-items: flex-start; }
+  .tl-item:first-child .tl-label::after { left: 14px; }
+  .tl-item:last-child .tl-label { width: 120px; left: auto; right: calc(50% - 32px); transform: none; text-align: right; align-items: flex-end; }
+  .tl-item:last-child .tl-label::after { left: auto; right: 31px; }
+  .northstar {
+    position: absolute; left: 120px; right: 120px; bottom: 150px;
+    display: grid; grid-template-columns: 1fr 2fr; gap: 64px; align-items: center;
+    padding: 40px 56px; border-radius: 28px;
+    background: linear-gradient(120deg, rgba(82,113,255,.24), rgba(82,113,255,.06));
+    border: 1.5px solid rgba(185,198,255,.28);
+  }
+  .northstar h3 { font-family: var(--display); font-weight: 700; font-size: 50px; text-wrap: balance; line-height: 1.02; letter-spacing: -0.03em; }
+  .northstar h3 small { display: block; font-family: var(--body); font-size: 21px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ice); margin-bottom: 14px; }
+  .northstar p { font-size: 26px; line-height: 1.45; color: #dfe5ff; }
+  .focus { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .focus li { position: relative; padding-left: 30px; display: flex; flex-direction: column; gap: 8px; }
+  .focus li::before { content: ""; position: absolute; left: 0; top: 9px; width: 14px; height: 14px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 5px rgba(82,113,255,.25); }
+  .focus strong { font-family: var(--display); font-size: 27px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; color: var(--white); }
+  .focus span { font-size: 21px; line-height: 1.4; color: #dfe5ff; }
+
+  /* ================= Organization ================= */
+  .org-stats { position: absolute; right: 120px; top: 166px; display: flex; align-items: baseline; gap: 26px; }
+  .org-stats div { display: flex; align-items: baseline; gap: 12px; }
+  .org-stats b { font-family: var(--display); font-size: 76px; font-weight: 700; letter-spacing: -0.04em; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
+  .org-stats span { font-size: 26px; font-weight: 600; color: var(--mute); }
+  .org-stats i { width: 2px; height: 56px; background: var(--line); align-self: center; }
+  .board {
+    position: relative; margin-top: 36px;
+    display: grid; grid-template-columns: 170px repeat(5, 1fr); align-items: center;
+    background: var(--navy); color: var(--white); border-radius: 22px; padding: 22px 40px;
+  }
+  .board::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 30px; background: var(--brand); }
+  .board > h3 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -0.01em; border-right: 1.5px solid rgba(185,198,255,.3); height: 100%; display: flex; align-items: center; }
+  .board .seat { padding-left: 32px; display: flex; flex-direction: column; gap: 4px; }
+  .board .seat span { font-size: 16px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ice); }
+  .board .seat strong { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+  .units { position: relative; margin-top: 56px; display: grid; grid-template-columns: repeat(5, 1fr) 1.42fr; gap: 28px; align-items: start; }
+  .ucol { position: relative; padding-top: 16px; border-top: 3px solid var(--brand); }
+  .ucol::before { content: ""; position: absolute; left: 24px; top: -29px; width: 2px; height: 26px; background: var(--brand); }
+  .ucol::after { content: ""; position: absolute; left: 24px; top: -29px; width: calc(100% + 28px); height: 2px; background: var(--brand); }
+  .ucol:last-child::after { display: none; }
+  .ucol .tap { position: absolute; left: 19px; top: -34px; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); z-index: 1; }
+  .ucol h3 { font-family: var(--display); font-weight: 700; font-size: 27px; line-height: 1.08; letter-spacing: -0.015em; color: var(--navy); min-height: 58px; padding-right: 44px; }
+  .ucol .head { margin-top: 10px; font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
+  .ucol ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ucol li { font-size: 21px; line-height: 1.25; color: var(--ink); }
+  .ucol li small { display: block; font-size: 16px; color: var(--mute); margin-top: 2px; }
+  .ucol.academy { background: var(--white); border: 2px solid var(--line); border-top: 3px solid var(--navy); border-radius: 0 0 18px 18px; padding: 16px 22px 18px; }
+  .ucol.academy ul { gap: 9px; }
+  .step { position: absolute; right: 0; top: 14px; width: 36px; height: 36px; border-radius: 50%; background: var(--signal); color: var(--white); font-size: 18px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 6px rgba(82,113,255,.16); }
+  .ucol.lit { border-top-color: var(--signal); }
+  .event-flow { position: absolute; left: 120px; top: 770px; width: 1312px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 40px; padding: 30px 36px 32px; background: var(--white); border: 2px solid var(--line); border-radius: 22px; font-size: 22px; color: var(--ink); }
+  .event-flow > strong { grid-column: 1 / -1; font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--navy); letter-spacing: -0.01em; }
+  .event-flow .s { display: flex; align-items: flex-start; gap: 16px; position: relative; }
+  .event-flow .s span { display: flex; flex-direction: column; gap: 2px; line-height: 1.3; color: var(--mute); }
+  .event-flow .s b { font-weight: 600; font-size: 24px; color: var(--ink); }
+  .event-flow .s i { font-style: normal; width: 32px; height: 32px; border-radius: 50%; background: var(--signal); color: var(--white); font-size: 15px; font-weight: 700; display: grid; place-items: center; flex: none; }
+
+  /* ================= Expectations ================= */
+  .exchange { position: absolute; left: 120px; right: 120px; top: 300px; bottom: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .side { border-radius: 28px; padding: 52px 60px; display: flex; flex-direction: column; }
+  .side h3 { font-family: var(--display); font-weight: 700; font-size: 50px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
+  .side h3 svg { width: 42px; height: 42px; }
+  .side ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .side li { position: relative; padding: 26px 0 26px 44px; border-top: 1.5px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+  .side li::before { content: ""; position: absolute; left: 0; top: 38px; width: 16px; height: 16px; border-radius: 50%; }
+  .side li strong { font-family: var(--display); font-size: 36px; font-weight: 600; line-height: 1.18; letter-spacing: -0.015em; text-wrap: balance; }
+  .side li span { font-size: 25px; line-height: 1.45; }
+  .side.get { background: var(--white); border: 2px solid var(--line); }
+  .side.get h3, .side.get li strong { color: var(--navy); }
+  .side.get li span { color: var(--mute); }
+  .side.get li::before { background: var(--white); border: 3px solid var(--signal); }
+  .side.expect { background: var(--navy); color: var(--white); }
+  .side.expect li { border-top-color: rgba(185,198,255,.22); }
+  .side.expect li strong { color: var(--white); }
+  .side.expect li::before { background: var(--signal); box-shadow: 0 0 0 6px rgba(82,113,255,.25); }
+  .side.expect .motto { margin-top: auto; padding-top: 28px; border-top: 1.5px solid rgba(185,198,255,.22); font-family: var(--display); font-size: 34px; font-weight: 600; color: var(--signal-soft); letter-spacing: -0.015em; }
+
+  /* ================= One organization ================= */
+  .shell { position: absolute; left: 120px; right: 120px; top: 320px; height: 330px; border: 3px solid var(--navy); border-radius: 28px; background: var(--paper); }
+  .shell .tab { position: absolute; left: 40px; top: -27px; display: flex; align-items: center; gap: 16px; background: var(--navy); color: var(--white); border-radius: 999px; padding: 10px 26px 10px 20px; }
+  .shell .tab img { height: 32px; width: auto; display: block; }
+  .shell .tab span { font-size: 21px; font-weight: 500; color: var(--ice); }
+  .shell .note { position: absolute; right: 40px; bottom: -24px; background: var(--white); border: 2px solid var(--signal); color: var(--navy); border-radius: 999px; padding: 9px 22px; font-size: 21px; font-weight: 600; }
+  .shell .caption { position: absolute; left: 60px; top: 52px; font-size: 25px; color: var(--mute); }
+  .shell .caption b { color: var(--navy); font-weight: 600; }
+  .track { position: absolute; left: 60px; right: 60px; top: 196px; height: 2px; background: var(--line); }
+  .ev { position: absolute; top: 1px; width: 0; height: 0; }
+  .ev::before { content: ""; position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--white); border: 3px solid var(--brand); box-sizing: border-box; }
+  .ev span { font-style: normal; position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 21px; font-weight: 500; color: var(--mute); }
+  .academy-bar { position: absolute; left: 35%; width: 44%; top: -44px; height: 88px; border-radius: 44px; background: linear-gradient(90deg, var(--cobalt), var(--signal)); color: var(--white); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; box-shadow: 0 18px 40px -18px rgba(82,113,255,.8); transform-origin: left center; }
+  .is-active .academy-bar { animation: grow 1.4s cubic-bezier(.4,.1,.2,1) both .6s; }
+  @keyframes grow { from { transform: scaleX(0); } }
+  .academy-bar strong { font-family: var(--display); font-size: 34px; font-weight: 700; letter-spacing: -0.015em; }
+  .academy-bar span { font-size: 20px; color: rgba(255,255,255,.9); }
+  .academy-bar em { position: absolute; left: 0; right: 0; top: 104px; text-align: center; font-style: normal; font-size: 21px; font-weight: 600; color: var(--cobalt); }
+  .one-points { position: absolute; left: 120px; right: 120px; top: 720px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 64px; }
+  .one-points div { position: relative; border-top: 2px solid var(--line); padding-top: 26px; }
+  .one-points div::before { content: ""; position: absolute; left: 0; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+  .one-points strong { display: block; font-family: var(--display); font-size: 36px; font-weight: 700; letter-spacing: -0.015em; color: var(--navy); margin-bottom: 10px; }
+  .one-points span { font-size: 25px; line-height: 1.45; color: var(--mute); }
+
+  /* ================= Slack ================= */
+  .s-slack .intro { position: absolute; left: 120px; top: 300px; bottom: 150px; width: 800px; display: flex; flex-direction: column; justify-content: center; gap: 56px; }
+  .s-slack .statement { font-family: var(--display); font-weight: 700; font-size: 64px; line-height: 1.05; letter-spacing: -0.03em; text-wrap: balance; }
+  .s-slack .statement mark { background: none; color: var(--signal-soft); }
+  .principles { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 36px; }
+  .principles li { display: grid; grid-template-columns: 64px 1fr; gap: 24px; align-items: start; }
+  .principles .ico { width: 64px; height: 64px; border-radius: 18px; background: rgba(82,113,255,.22); border: 1.5px solid rgba(143,163,255,.4); display: grid; place-items: center; }
+  .principles .ico svg { width: 34px; height: 34px; }
+  .principles strong { display: block; font-family: var(--display); font-size: 34px; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 8px; }
+  .principles span { display: block; font-size: 25px; line-height: 1.45; color: var(--ice); max-width: 40ch; }
+  .workspace { position: absolute; left: 1010px; right: 120px; top: 300px; bottom: 150px; border-radius: 28px; background: rgba(255,255,255,.06); border: 1.5px solid rgba(185,198,255,.22); padding: 36px 40px; display: flex; flex-direction: column; }
+  .ws-label { font-size: 17px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ice); margin-bottom: 12px; display: flex; justify-content: space-between; }
+  .ws-mgmt { display: flex; align-items: center; gap: 16px; background: var(--signal); border-radius: 16px; padding: 18px 24px; box-shadow: 0 16px 40px -18px rgba(82,113,255,.9); }
+  .ws-mgmt .hash { font-family: var(--display); font-size: 34px; font-weight: 700; color: rgba(255,255,255,.7); }
+  .ws-mgmt strong { font-family: var(--display); font-size: 32px; font-weight: 700; letter-spacing: -0.01em; }
+  .ws-mgmt .sub { margin-left: auto; font-size: 20px; color: rgba(255,255,255,.88); }
+  .ws-units { margin-top: 26px; }
+  .ws-tree { list-style: none; margin: 0; padding: 0 0 0 46px; position: relative; display: flex; flex-direction: column; gap: 8px; }
+  .ws-tree::before { content: ""; position: absolute; left: 22px; top: -64px; bottom: 26px; width: 2px; background: linear-gradient(var(--signal), rgba(143,163,255,.45)); }
+  .ws-tree li { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 11px 18px; border-radius: 12px; background: rgba(255,255,255,.06); }
+  .ws-tree li::before { content: ""; position: absolute; left: -24px; top: 50%; width: 24px; height: 2px; background: rgba(143,163,255,.55); }
+  .ws-tree li::after { content: ""; position: absolute; left: -29px; top: calc(50% - 6px); width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+  .ws-tree .hash { font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--signal-soft); }
+  .ws-tree strong { font-size: 25px; font-weight: 600; color: var(--white); }
+  .ws-tree em { font-style: normal; font-size: 19px; color: var(--ice); }
+
+  /* ================= Student Society Day ================= */
+  .ssd-main { position: absolute; left: 120px; top: 300px; bottom: 150px; width: 880px; display: flex; flex-direction: column; gap: 48px; }
+  .ssd-date { display: flex; align-items: center; gap: 32px; }
+  .ssd-date b { font-family: var(--display); font-size: 190px; font-weight: 700; line-height: .8; letter-spacing: -0.06em; color: var(--signal); font-variant-numeric: tabular-nums; }
+  .ssd-date div { display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
+  .ssd-date strong { font-family: var(--display); font-size: 52px; font-weight: 700; letter-spacing: -0.02em; color: var(--navy); line-height: 1; }
+  .ssd-date span { font-size: 28px; color: var(--mute); }
+  .ssd-why { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; }
+  .ssd-why div { border-top: 2px solid var(--line); padding-top: 22px; position: relative; }
+  .ssd-why div::before { content: ""; position: absolute; left: 0; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+  .ssd-why strong { display: block; font-family: var(--display); font-size: 34px; font-weight: 700; letter-spacing: -0.015em; color: var(--navy); margin-bottom: 10px; }
+  .ssd-why span { font-size: 25px; line-height: 1.45; color: var(--mute); }
+  .ssd-cta { margin-top: auto; background: var(--navy); color: var(--white); border-radius: 24px; padding: 32px 40px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 32px; overflow: hidden; position: relative; }
+  .ssd-cta::after { content: ""; position: absolute; right: -80px; top: -120px; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(circle, rgba(82,113,255,.5), transparent 70%); }
+  .ssd-cta strong { display: block; font-family: var(--display); font-size: 42px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .ssd-cta span { font-size: 23px; line-height: 1.45; color: #dfe5ff; }
+  .ssd-cta svg { width: 64px; height: 64px; position: relative; z-index: 1; }
+  .ssd-day { position: absolute; left: 1080px; right: 120px; top: 300px; bottom: 150px; background: var(--white); border: 2px solid var(--line); border-radius: 28px; padding: 36px 44px; display: flex; flex-direction: column; }
+  .ssd-day h3 { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--navy); letter-spacing: -0.015em; margin-bottom: 18px; }
+  .ssd-day ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; flex: 1; justify-content: space-between; position: relative; }
+  .ssd-day ol::before { content: ""; position: absolute; left: 9px; top: 18px; bottom: 30px; width: 2px; background: linear-gradient(var(--signal), var(--line)); }
+  .ssd-day li { position: relative; padding-left: 44px; display: flex; flex-direction: column; gap: 3px; }
+  .ssd-day li::before { content: ""; position: absolute; left: 0; top: 7px; width: 20px; height: 20px; border-radius: 50%; background: var(--white); border: 3px solid var(--signal); box-sizing: border-box; }
+  .ssd-day li.key::before { background: var(--signal); box-shadow: 0 0 0 6px rgba(82,113,255,.18); }
+  .ssd-day time { font-size: 20px; font-weight: 700; color: var(--cobalt); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .ssd-day strong { font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+  .ssd-day span { font-size: 20px; color: var(--mute); }
+
+  /* ================= Links ================= */
+  .link-btn { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; font-size: 24px; font-weight: 600; border-radius: 999px; padding: 14px 26px; transition: background .2s, color .2s, box-shadow .2s, transform .2s; }
+  .link-btn svg { width: 22px; height: 22px; flex: none; }
+  .link-btn:focus-visible { outline: 3px solid var(--signal); outline-offset: 4px; }
+  .link-btn.solid { background: var(--signal); color: var(--white); box-shadow: 0 14px 30px -14px rgba(82,113,255,.9); }
+  .link-btn.solid:hover { background: var(--navy); transform: translateY(-2px); }
+  .link-btn.pending { background: transparent; color: var(--mute); border: 2px dashed #b7c2e6; box-shadow: none; cursor: default; }
+  .link-btn.pending:hover { background: transparent; transform: none; }
+  .shell .site { position: absolute; right: 40px; top: 38px; padding: 11px 22px; font-size: 22px; }
+
+  /* ================= Website ================= */
+  .web-main { position: absolute; left: 120px; top: 300px; bottom: 150px; width: 780px; display: flex; flex-direction: column; justify-content: center; gap: 44px; }
+  .web-main .statement { font-family: var(--display); font-weight: 700; font-size: 64px; line-height: 1.05; letter-spacing: -0.03em; color: var(--navy); text-wrap: balance; }
+  .web-main .statement mark { background: none; color: var(--signal); }
+  .handoff { display: flex; align-items: center; gap: 24px; padding: 26px 30px; background: var(--white); border: 2px solid var(--line); border-radius: 22px; }
+  .handoff .avatar { width: 76px; height: 76px; border-radius: 50%; background: var(--navy); color: var(--white); display: grid; place-items: center; font-family: var(--display); font-size: 34px; font-weight: 700; flex: none; box-shadow: 0 0 0 8px rgba(82,113,255,.16); }
+  .handoff strong { display: block; font-family: var(--display); font-size: 36px; font-weight: 700; letter-spacing: -0.015em; color: var(--navy); }
+  .handoff span { font-size: 24px; color: var(--mute); }
+  .browser { position: absolute; left: 980px; right: 120px; top: 300px; bottom: 150px; border-radius: 22px; background: var(--white); border: 2px solid var(--line); box-shadow: 0 40px 80px -40px rgba(0,22,122,.35); overflow: hidden; display: flex; flex-direction: column; }
+  .browser-bar { display: flex; align-items: center; gap: 18px; padding: 18px 22px; background: #e9edf8; border-bottom: 1.5px solid var(--line); }
+  .browser-bar .dots { display: flex; gap: 9px; }
+  .browser-bar .dots i { width: 14px; height: 14px; border-radius: 50%; background: #c3cce8; }
+  .browser-bar .url { flex: 1; display: flex; align-items: center; gap: 12px; background: var(--white); border-radius: 999px; padding: 10px 20px; font-size: 20px; color: var(--mute); }
+  .browser-bar .url svg { width: 18px; height: 18px; flex: none; }
+  .browser-body { position: relative; flex: 1; padding: 40px 48px; display: flex; flex-direction: column; gap: 28px; background: linear-gradient(160deg, var(--navy), #031064 60%, var(--night)); overflow: hidden; }
+  .browser-body .circuit { position: absolute; right: -40px; top: -20px; width: 420px; height: 520px; opacity: .8; }
+  .skel-nav { display: flex; align-items: center; justify-content: space-between; position: relative; }
+  .skel-nav img { height: 40px; width: auto; }
+  .skel-nav div { display: flex; gap: 18px; }
+  .skel-nav div i { width: 70px; height: 10px; border-radius: 5px; background: rgba(185,198,255,.35); }
+  .skel-hero { position: relative; display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+  .skel-hero i { height: 34px; border-radius: 10px; background: rgba(255,255,255,.9); }
+  .skel-hero i:nth-child(2) { width: 70%; }
+  .skel-hero i.sub { height: 14px; width: 55%; background: rgba(185,198,255,.45); margin-top: 8px; }
+  .skel-hero i.btn { height: 44px; width: 180px; border-radius: 999px; background: var(--signal); margin-top: 10px; }
+  .skel-cards { position: relative; margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .skel-cards i { height: 110px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1.5px solid rgba(185,198,255,.2); }
+  .browser-body .soon { position: absolute; right: 40px; bottom: 160px; background: var(--white); color: var(--navy); font-size: 20px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 10px 18px; border-radius: 999px; }
+
+  /* ================= Closing ================= */
+  .s-close { padding: 0; background: var(--night); }
+  .s-close img.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+  .is-active img.photo { animation: settle 6s ease-out both; }
+  @keyframes settle { from { transform: scale(1.06); } }
+  .s-close .shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6,13,51,1) 0%, rgba(6,13,51,.92) 30%, rgba(0,22,122,.35) 62%, rgba(6,13,51,.2) 100%); }
+  .s-close .content { position: absolute; left: 140px; right: 140px; bottom: 150px; display: flex; flex-direction: column; gap: 28px; }
+  .s-close h2 { font-family: var(--display); font-weight: 700; font-size: 150px; line-height: .95; letter-spacing: -0.04em; color: var(--white); }
+  .s-close .sub { font-size: 40px; color: var(--ice); font-weight: 500; }
+  .s-close .foot { position: absolute; left: 140px; bottom: 56px; display: flex; align-items: center; gap: 22px; font-size: 20px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: rgba(185,198,255,.8); }
+  .s-close .foot img { height: 44px; width: auto; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .slide.is-active { transition: opacity .2s linear, visibility 0s; transform: none; }
+    .is-active .rv, .is-active .trace, .is-active .node-pop, .is-active img.photo { animation: none; }
+  }
+</style>
+
+<div class="viewport">
+  <main class="stage" id="stage" aria-live="polite">
+
+    <div class="chrome-top" aria-hidden="true">
+      <div><img class="logo-blue" src="assets/logo-blue.png" alt=""><img class="logo-white" src="assets/logo-white.png" alt=""></div>
+      <span class="part" id="part"></span>
+    </div>
+
+    <!-- Title -->
+    <section class="slide tone-dark s-title" data-tone="dark" data-chrome="off" aria-label="Welcome to CBS AI">
+      <svg class="circuit" viewBox="0 0 1000 1080" fill="none" aria-hidden="true">
+        <g stroke="rgba(185,198,255,.5)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path class="trace" style="--i:0" d="M470 -20 V230 L380 320 V500"/>
+          <path class="trace" style="--i:1" d="M580 -20 V350 L670 440 V650"/>
+          <path class="trace" style="--i:2" d="M720 -20 V130 L810 220 V300"/>
+          <path class="trace" style="--i:3" d="M330 1100 V840 L420 750 V620"/>
+          <path class="trace" style="--i:4" d="M520 1100 V920 L610 830 V770 L520 680"/>
+          <path class="trace" style="--i:5" d="M850 1100 V720 L760 630 V500"/>
+          <path class="trace" style="--i:6" d="M1020 400 H920 L880 440 V580"/>
+          <path class="trace" style="--i:7" d="M1020 900 H940 L900 860 V800"/>
+        </g>
+        <g>
+          <circle class="node-pop" style="--i:0" cx="380" cy="500" r="16" fill="#5271ff"/>
+          <circle class="node-pop" style="--i:0" cx="470" cy="230" r="13" fill="#060d33" stroke="#ffffff" stroke-width="3"/>
+          <circle class="node-pop" style="--i:1" cx="670" cy="650" r="16" fill="#5271ff"/>
+          <circle class="node-pop" style="--i:2" cx="810" cy="300" r="16" fill="#5271ff"/>
+          <circle class="node-pop" style="--i:3" cx="420" cy="620" r="13" fill="#060d33" stroke="#ffffff" stroke-width="3"/>
+          <circle class="node-pop" style="--i:4" cx="520" cy="680" r="16" fill="#5271ff"/>
+          <circle class="node-pop" style="--i:5" cx="760" cy="500" r="13" fill="#060d33" stroke="#ffffff" stroke-width="3"/>
+          <circle class="node-pop" style="--i:6" cx="880" cy="580" r="16" fill="#5271ff"/>
+          <circle class="node-pop" style="--i:7" cx="900" cy="800" r="13" fill="#060d33" stroke="#ffffff" stroke-width="3"/>
+          <circle class="node-pop" style="--i:3" cx="580" cy="350" r="13" fill="#060d33" stroke="#ffffff" stroke-width="3"/>
+        </g>
+      </svg>
+      <div class="content">
+        <img class="rv" style="--i:0" src="assets/logo-white.png" alt="CBS AI">
+        <h1 class="rv" style="--i:1">Welcome to <em>CBS&nbsp;AI</em></h1>
+        <p class="sub rv" style="--i:2"><span class="dot"></span>Internal Kickoff · 2026/27</p>
+        <p class="tagline rv" style="--i:3">What we do, why we exist, and where you fit in.</p>
+      </div>
+      <p class="foot rv" style="--i:4">Copenhagen Business School</p>
+    </section>
+
+    <!-- Agenda -->
+    <section class="slide tone-light s-agenda" data-tone="light" data-part="Internal Kickoff · 2026/27" aria-label="Tonight in five parts">
+      <h2 class="headline rv" style="--i:0">Tonight in four parts</h2>
+      <nav class="agenda" aria-label="Agenda">
+        <button type="button" class="rv" style="--i:1" data-target="s-mission"><span class="num">01</span><span class="ttl">Who we are</span><span class="dsc">Our purpose, and why CBS × AI matters</span></button>
+        <button type="button" class="rv" style="--i:2" data-target="s-do"><span class="num">02</span><span class="ttl">What we do</span><span class="dsc">Our activities, the road so far and our new website</span></button>
+        <button type="button" class="rv" style="--i:3" data-target="s-org"><span class="num">03</span><span class="ttl">The team</span><span class="dsc">28 people, 7 units, and how we talk</span></button>
+        <button type="button" class="rv" style="--i:4" data-target="s-expect"><span class="num">04</span><span class="ttl">What to expect</span><span class="dsc">What we ask of you, and your first task</span></button>
+      </nav>
+    </section>
+
+    <!-- 01 · Purpose statement -->
+    <section class="slide tone-dark s-mission" id="s-mission" data-tone="dark" data-part="01|Who we are" aria-label="Our purpose">
+      <figure class="rv" style="--i:0"><img src="assets/academy-2.jpg" alt="A speaker presenting at the CBS AI Academy"></figure>
+      <div class="content">
+        <p class="statement rv" style="--i:1">CBS AI is a student-driven organization dedicated to <mark>bridging the gap between AI and business.</mark></p>
+        <p class="support rv" style="--i:2">We equip CBS students with the knowledge and insights needed to navigate the rapidly evolving world of Artificial Intelligence through <strong>educational events and networking opportunities.</strong> By collaborating with industry leaders, we bring the latest developments, real-world applications, and career opportunities directly to you.</p>
+      </div>
+    </section>
+
+    <!-- 01 · Bridging -->
+    <section class="slide tone-light s-purpose" data-tone="light" data-part="01|Who we are" aria-label="Bridging AI and Business">
+      <h2 class="headline rv" style="--i:0">Bridging AI and Business</h2>
+      <div class="poles">
+        <div class="pole left rv" style="--i:1">
+          <div class="pole-head">
+            <svg viewBox="0 0 56 56" fill="none" stroke="#5271ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="14" y="14" width="28" height="28" rx="5"/><rect x="22" y="22" width="12" height="12" rx="2" fill="#5271ff"/><path d="M22 14V6M34 14V6M22 50v-8M34 50v-8M14 22H6M14 34H6M50 22h-8M50 34h-8"/></svg>
+            <h3>Technology.</h3>
+          </div>
+          <p class="claim">Moving faster than curricula.</p>
+          <p class="lede">New models, tools, and methods arrive every month.</p>
+        </div>
+        <div class="junction rv" style="--i:2" aria-hidden="true">
+          <svg viewBox="0 0 220 420" fill="none">
+            <path class="trace" d="M0 40 H60 L110 90 V230" stroke="#b9c6ff" stroke-width="3" stroke-linejoin="round"/>
+            <path class="trace" d="M220 40 H160 L110 90" stroke="#b9c6ff" stroke-width="3" stroke-linejoin="round"/>
+            <path class="trace" d="M110 250 V420" stroke="#5271ff" stroke-width="3" stroke-dasharray="6 10"/>
+            <circle cx="110" cy="240" r="16" fill="#5271ff"/>
+          </svg>
+        </div>
+        <div class="pole rv" style="--i:3">
+          <div class="pole-head">
+            <svg viewBox="0 0 56 56" fill="none" stroke="#5271ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 46h44"/><rect x="10" y="30" width="8" height="16" rx="1.5"/><rect x="24" y="20" width="8" height="26" rx="1.5"/><rect x="38" y="10" width="8" height="36" rx="1.5" fill="#5271ff"/></svg>
+            <h3>Business.</h3>
+          </div>
+          <p class="claim">Asking what it means in practice.</p>
+          <p class="lede">Companies need people who can translate AI into commercial decisions.</p>
+        </div>
+      </div>
+      <div class="callout rv" style="--i:4">
+        <div class="mark">CBS<span class="x">×</span><span>AI</span></div>
+        <p><strong>Two of the most critical words in business sit in our name,</strong> and we operate exactly where they meet.</p>
+      </div>
+    </section>
+
+    <!-- 02 · What we do -->
+    <section class="slide tone-white s-do" id="s-do" data-tone="light" data-part="02|What we do" aria-label="Turning Developments into Applications">
+      <h2 class="headline rv" style="--i:0">Turning Developments into Applications</h2>
+      <div class="pillars">
+        <div class="pillar rv" style="--i:1">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#00167a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="10" width="52" height="34" rx="4"/><path d="M32 44v10M22 56h20"/><path d="M16 34l10-10 8 6 14-12" stroke="#5271ff"/><circle cx="48" cy="18" r="3" fill="#5271ff" stroke="#5271ff"/></svg>
+          <h3>Educational Events</h3>
+          <p>Workshops, talks, and cases.</p>
+        </div>
+        <div class="pillar rv" style="--i:2">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#00167a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 18L44 22M18 24l12 22M46 28L34 46" stroke="#5271ff"/><circle cx="14" cy="16" r="7"/><circle cx="50" cy="22" r="7"/><circle cx="32" cy="50" r="8" fill="#5271ff" stroke="#5271ff"/></svg>
+          <h3>Networking</h3>
+          <p>Connecting students, founders, and practitioners.</p>
+        </div>
+        <div class="pillar rv" style="--i:3">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#00167a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 56h48"/><path d="M12 56V26l14 8V26l14 8V14h12v42"/><path d="M46 14V6" stroke="#5271ff"/><rect x="18" y="42" width="6" height="6" fill="#5271ff" stroke="#5271ff"/><rect x="32" y="42" width="6" height="6"/></svg>
+          <h3>Industry Collaboration</h3>
+          <p>Bringing real applications to CBS.</p>
+        </div>
+      </div>
+      <article class="case rv" style="--i:4">
+        <figure><img src="assets/academy-1.jpg" alt="Students following a CBS AI partner workshop"></figure>
+        <div class="body">
+          <h3>From Theory to Practice <span class="tag">Real-world case</span></h3>
+          <blockquote>“How we applied AI software tools to optimize B2B sales automation and financial analysis workflows in our latest partner workshop.”</blockquote>
+        </div>
+      </article>
+    </section>
+
+    <!-- 02 · Journey -->
+    <section class="slide tone-dark s-journey" data-tone="dark" data-part="02|What we do" aria-label="Where We Started, Where We Are Going">
+      <h2 class="headline rv" style="--i:0">Where We Started, Where We Are Going</h2>
+      <div class="journey-legend rv" style="--i:0" aria-hidden="true"><span><i class="m"></i>Milestone</span><span><i class="e"></i>Event</span></div>
+      <ol class="tl" role="list" style="margin:0;padding:0;list-style:none">
+        <li class="tl-item ms rv" style="--i:1"><i class="tl-node"></i><div class="tl-label up"><time>Jan 2024</time><strong>CBS AI founded</strong></div></li>
+        <li class="tl-item rv" style="--i:2"><i class="tl-node"></i><div class="tl-label down"><time>Feb</time><strong>Devoteam</strong></div></li>
+        <li class="tl-item rv" style="--i:3"><i class="tl-node"></i><div class="tl-label up"><time>Sep</time><strong>Alice.tech</strong></div></li>
+        <li class="tl-item rv" style="--i:4"><i class="tl-node"></i><div class="tl-label down"><time>Oct</time><strong>Deloitte</strong></div></li>
+        <li class="tl-item rv" style="--i:5"><i class="tl-node"></i><div class="tl-label up"><time>Nov</time><strong>BCG</strong></div></li>
+        <li class="tl-item rv" style="--i:6"><i class="tl-node"></i><div class="tl-label down"><time>Feb 2025</time><strong>Rambøll</strong></div></li>
+        <li class="tl-item rv" style="--i:7"><i class="tl-node"></i><div class="tl-label up"><time>Mar</time><strong>Microsoft · three events</strong></div></li>
+        <li class="tl-item rv" style="--i:8"><i class="tl-node"></i><div class="tl-label down"><time>Sep</time><strong>PwC</strong></div></li>
+        <li class="tl-item ms rv" style="--i:9"><i class="tl-node"></i><div class="tl-label up"><time>Sep</time><strong>Official State partnership</strong></div></li>
+        <li class="tl-item ms rv" style="--i:10"><i class="tl-node"></i><div class="tl-label down"><time>Oct</time><strong>Official Accenture partnership</strong></div></li>
+        <li class="tl-item rv" style="--i:11"><i class="tl-node"></i><div class="tl-label up"><time>Nov</time><strong>Accenture</strong></div></li>
+        <li class="tl-item rv" style="--i:12"><i class="tl-node"></i><div class="tl-label down"><time>Dec</time><strong>Connected Women in AI</strong></div></li>
+        <li class="tl-item rv" style="--i:13"><i class="tl-node"></i><div class="tl-label up"><time>Feb 2026</time><strong>EY</strong></div></li>
+        <li class="tl-item ms rv" style="--i:14"><i class="tl-node"></i><div class="tl-label down"><time>Apr</time><strong>CBS AI Academy</strong></div></li>
+        <li class="tl-item ms rv" style="--i:15"><i class="tl-node"></i><div class="tl-label up"><time>May</time><strong>CBS AI Day</strong></div></li>
+        <li class="tl-item next rv" style="--i:16"><i class="tl-node"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="rgba(82,113,255,.35)"/><path d="M32 7 L37 27 L57 32 L37 37 L32 57 L27 37 L7 32 L27 27 Z" fill="#ffffff"/></svg></i><div class="tl-label down"><time>From here</time><strong>What’s next?</strong></div></li>
+      </ol>
+      <div class="northstar rv" style="--i:17">
+        <h3><small>What’s next · 2026/27</small>Building a sustainable organization.</h3>
+        <ul class="focus">
+          <li><strong>Sustainable across all units</strong><span>Every unit set up to run, grow and hand over well.</span></li>
+          <li><strong>Closer to CBS academia</strong><span>Collaborating with CBS faculty and programmes.</span></li>
+          <li><strong>Events, inside and out</strong><span>Continuing to host both external and internal events.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 02 · New website -->
+    <section class="slide tone-light s-web" id="s-web" data-tone="light" data-part="02|What we do" aria-label="Introducing Our New Website">
+      <h2 class="headline rv" style="--i:0">Introducing Our New Website</h2>
+      <div class="web-main">
+        <p class="statement rv" style="--i:1">CBS AI has a new <mark>official website.</mark></p>
+        <div class="handoff rv" style="--i:2">
+          <span class="avatar" aria-hidden="true">E</span>
+          <div><strong>Over to Elias</strong><span>Elias will now showcase the new website.</span></div>
+        </div>
+        <div class="rv" style="--i:3">
+          <a class="link-btn solid" data-site-link href="#" target="_blank" rel="noopener"><span data-site-label>Open the website</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+        </div>
+      </div>
+      <div class="browser rv" style="--i:2" aria-hidden="true">
+        <div class="browser-bar">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-site-url>Link coming soon</span></span>
+        </div>
+        <div class="browser-body">
+          <svg class="circuit" viewBox="0 0 420 520" fill="none">
+            <g stroke="rgba(185,198,255,.45)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path class="trace" d="M200 -10 V120 L140 180 V300"/>
+              <path class="trace" style="--i:1" d="M300 -10 V220 L360 280 V420"/>
+              <path class="trace" style="--i:2" d="M60 530 V420 L120 360 V300"/>
+            </g>
+            <circle class="node-pop" cx="140" cy="300" r="11" fill="#5271ff"/>
+            <circle class="node-pop" style="--i:1" cx="360" cy="420" r="11" fill="#5271ff"/>
+            <circle class="node-pop" style="--i:2" cx="120" cy="300" r="9" fill="#060d33" stroke="#fff" stroke-width="2.5"/>
+            <circle class="node-pop" cx="200" cy="120" r="9" fill="#060d33" stroke="#fff" stroke-width="2.5"/>
+          </svg>
+          <div class="skel-nav"><img src="assets/logo-white.png" alt=""><div><i></i><i></i><i></i></div></div>
+          <div class="skel-hero"><i></i><i></i><i class="sub"></i><i class="btn"></i></div>
+          <div class="skel-cards"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · Organization -->
+    <section class="slide tone-light s-org" id="s-org" data-tone="light" data-part="03|The team" aria-label="The 2026/27 Organization">
+      <h2 class="headline rv" style="--i:0">The 2026/27 Organization</h2>
+      <div class="org-stats rv" style="--i:1">
+        <div><b>28</b><span>People</span></div><i aria-hidden="true"></i><div><b>7</b><span>Units</span></div>
+      </div>
+
+      <div class="board rv" style="--i:2">
+        <h3>Board</h3>
+        <div class="seat"><span>President</span><strong>Nicklas Hampe</strong></div>
+        <div class="seat"><span>Vice President</span><strong>Lucas Buch</strong></div>
+        <div class="seat"><span>Academy</span><strong>Darina Starodumova</strong></div>
+        <div class="seat"><span>Funding</span><strong>Oskar Bugge</strong></div>
+        <div class="seat"><span>Founder</span><strong>Oskar Bührmann</strong></div>
+      </div>
+
+      <div class="units">
+        <div class="ucol rv" style="--i:3"><i class="tap"></i>
+          <h3>People &amp; Organisation</h3>
+          <p class="head">Nic Philipps</p>
+        </div>
+        <div class="ucol rv" style="--i:4"><i class="tap"></i>
+          <h3>Funding</h3>
+          <p class="head">Oskar Bugge</p>
+          <ul><li>Elias Ribe</li></ul>
+        </div>
+        <div class="ucol lit rv" style="--i:5"><i class="tap"></i><span class="step" aria-label="Event step 1">1</span>
+          <h3>Partnerships</h3>
+          <p class="head">Lucas Buch</p>
+          <ul><li>Magnus Christoffersen</li><li>Isa Walsh</li><li>Anil Sahin</li><li>Mikkel Tufto-Antonsen</li></ul>
+        </div>
+        <div class="ucol lit rv" style="--i:6"><i class="tap"></i><span class="step" aria-label="Event step 2">2</span>
+          <h3>Marketing &amp; Community</h3>
+          <p class="head">Sieun Lee</p>
+          <ul><li>Ester</li><li>Alexander</li><li>Laurits</li><li>David</li></ul>
+        </div>
+        <div class="ucol lit rv" style="--i:7"><i class="tap"></i><span class="step" aria-label="Event step 3">3</span>
+          <h3>Operations</h3>
+          <p class="head">Ellen Lansfjord</p>
+          <ul><li>Vanessa Begovic</li><li>Natasha</li><li>Clara</li><li>William Munch Holst</li><li>Otto Nordraak</li></ul>
+        </div>
+        <div class="ucol academy rv" style="--i:8"><i class="tap"></i>
+          <h3>Academy</h3>
+          <p class="head">Darina Starodumova</p>
+          <ul>
+            <li>Ahmad Al Wazani<small>Tech &amp; Knowledge</small></li>
+            <li>Grzegorz Piotr Robaczyk<small>Programme &amp; Learning</small></li>
+            <li>Liv Ahnlund<small>Partnerships &amp; Stakeholder Mgmt</small></li>
+            <li>Huda Al-Bazy<small>Volunteer &amp; Social Media</small></li>
+            <li>Enzo Miles-Bebber<small>Marketing &amp; Demand Gen.</small></li>
+            <li>Jaroslav Denemark<small>Activation</small></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="event-flow rv" style="--i:9">
+        <strong>How we build an event</strong>
+        <div class="s"><i>1</i><span><b>Partnerships</b>secures the industry speaker</span></div>
+        <div class="s"><i>2</i><span><b>Marketing</b>fills the room</span></div>
+        <div class="s"><i>3</i><span><b>Operations</b>executes on the floor</span></div>
+      </div>
+    </section>
+
+    <!-- 03 · One organization -->
+    <section class="slide tone-white s-one" id="s-one" data-tone="light" data-part="03|The team" aria-label="CBS AI Academy Is Part of CBS AI">
+      <h2 class="headline rv" style="--i:0">CBS AI Academy Is Part of CBS AI</h2>
+      <div class="shell rv" style="--i:1" role="img" aria-label="CBS AI is the organization. Inside it sit all our events: talks, workshops, networking and cases, and CBS AI Academy, which is one long event led by Darina and her team.">
+        <div class="tab"><img src="assets/logo-white.png" alt=""><span>The organization</span></div>
+        <div class="note">No CBS AI Academy without CBS AI</div>
+        <p class="caption"><b>Everything we run happens inside CBS AI.</b> Academy is one of our events.</p>
+        <a class="link-btn solid site" href="http://cbsai-academy.dk" target="_blank" rel="noopener">cbsai-academy.dk<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+        <div class="track">
+          <i class="ev" style="left:4%"><span>Talk</span></i>
+          <i class="ev" style="left:14%"><span>Workshop</span></i>
+          <i class="ev" style="left:25%"><span>Networking</span></i>
+          <div class="academy-bar"><strong>CBS AI Academy</strong><span>Darina + her team</span><em>One long event: far more work and planning</em></div>
+          <i class="ev" style="left:87%"><span>Case</span></i>
+          <i class="ev" style="left:96%"><span>Talk</span></i>
+        </div>
+      </div>
+      <div class="one-points">
+        <div class="rv" style="--i:2"><strong>One organization</strong><span>CBS AI is the organization. CBS AI Academy is not a separate entity; it is an event underneath CBS AI.</span></div>
+        <div class="rv" style="--i:3"><strong>A much longer event</strong><span>Academy runs over a longer period, so it takes a lot more work and planning than a single evening.</span></div>
+        <div class="rv" style="--i:4"><strong>Why Academy has a big team</strong><span>Darina leads a larger team so we can plan ahead and execute Academy well.</span></div>
+      </div>
+    </section>
+
+    <!-- 03 · Slack -->
+    <section class="slide tone-dark s-slack" id="s-slack" data-tone="dark" data-part="03|The team" aria-label="Open Communication in Slack">
+      <h2 class="headline rv" style="--i:0">Open Communication in Slack</h2>
+      <div class="intro">
+        <p class="statement rv" style="--i:1">All internal communication happens in <mark>Slack.</mark></p>
+        <ul class="principles">
+          <li class="rv" style="--i:2">
+            <i class="ico"><svg viewBox="0 0 34 34" fill="none" stroke="#b9c6ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9a4 4 0 0 1 4-4h16a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H14l-6 5v-5H9a4 4 0 0 1-4-4z"/><circle cx="12" cy="14" r="1.2" fill="#b9c6ff"/><circle cx="17" cy="14" r="1.2" fill="#b9c6ff"/><circle cx="22" cy="14" r="1.2" fill="#b9c6ff"/></svg></i>
+            <div><strong>Talk in channels, not in private</strong><span>Don’t just message privately. Keep conversations open so nobody is left out.</span></div>
+          </li>
+          <li class="rv" style="--i:3">
+            <i class="ico"><svg viewBox="0 0 34 34" fill="none" stroke="#b9c6ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="7" r="4"/><circle cx="7" cy="27" r="4"/><circle cx="27" cy="27" r="4"/><path d="M17 11v6M17 17L9 24M17 17l8 7"/></svg></i>
+            <div><strong>Built so we stay on the same page</strong><span>Every unit has its own channel, and all heads share a channel with management, so we can collaborate effectively on projects.</span></div>
+          </li>
+        </ul>
+      </div>
+      <div class="workspace rv" style="--i:2" role="img" aria-label="Slack structure: a management channel with the board and all unit heads, connected to six unit channels, each led by its head">
+        <p class="ws-label"><span>Management channel</span></p>
+        <div class="ws-mgmt"><span class="hash">#</span><strong>Management</strong><span class="sub">Board + all unit heads</span></div>
+        <div class="ws-units">
+          <p class="ws-label"><span>Unit channels</span><span>Head</span></p>
+          <ul class="ws-tree">
+            <li><span class="hash">#</span><strong>People &amp; Organisation</strong><em>Nic Philipps</em></li>
+            <li><span class="hash">#</span><strong>Funding</strong><em>Oskar Bugge</em></li>
+            <li><span class="hash">#</span><strong>Partnerships</strong><em>Lucas Buch</em></li>
+            <li><span class="hash">#</span><strong>Marketing &amp; Community</strong><em>Sieun Lee</em></li>
+            <li><span class="hash">#</span><strong>Operations</strong><em>Ellen Lansfjord</em></li>
+            <li><span class="hash">#</span><strong>Academy</strong><em>Darina Starodumova</em></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 · Expectations -->
+    <section class="slide tone-light s-expect" id="s-expect" data-tone="light" data-part="04|What to expect" aria-label="Hitting the Ground Running">
+      <h2 class="headline rv" style="--i:0">Hitting the Ground Running</h2>
+      <div class="exchange">
+        <div class="side get rv" style="--i:1">
+          <h3><svg viewBox="0 0 40 40" fill="none" stroke="#5271ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6v24M10 20l10 10 10-10M6 34h28"/></svg>What you get</h3>
+          <ul>
+            <li><strong>A network of tomorrow’s leaders.</strong><span>We are a social organisation first: the people you meet here are the people you will work with later.</span></li>
+            <li><strong>The chance to become an expert in the most important technological shift of our time.</strong><span>Whatever you go on to do, this is the subject you will be asked about.</span></li>
+          </ul>
+        </div>
+        <div class="side expect rv" style="--i:2">
+          <h3><svg viewBox="0 0 40 40" fill="none" stroke="#b9c6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 34V10M10 20l10-10 10 10M6 6h28"/></svg>What we expect</h3>
+          <ul>
+            <li><strong>Proactive project ownership.</strong></li>
+            <li><strong>Mandatory all-hands attendance.</strong></li>
+            <li><strong>A commitment to winning together.</strong></li>
+          </ul>
+          <p class="motto">We like to win together while having fun.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 · Student Society Day -->
+    <section class="slide tone-light s-ssd" id="s-ssd" data-tone="light" data-part="04|What to expect" aria-label="Sign Up for Student Society Day">
+      <h2 class="headline rv" style="--i:0">Sign Up for Student Society Day</h2>
+      <div class="ssd-main">
+        <div class="ssd-date rv" style="--i:1"><b>24</b><div><strong>September</strong><span>Thursday · Solbjerg Plads</span></div></div>
+        <div class="ssd-why">
+          <div class="rv" style="--i:2"><strong>Be seen by new students</strong><span>This is where new students discover the organizations they’ll join. CBS AI needs to be visible.</span></div>
+          <div class="rv" style="--i:3"><strong>A genuinely fun day</strong><span>Talk to lots of interested students and represent CBS AI together.</span></div>
+        </div>
+        <div class="ssd-cta rv" style="--i:4">
+          <div><strong>We need more sign-ups</strong><span>Write your name next to a time slot in the Booth Signup sheet on the shared drive.</span></div>
+          <svg viewBox="0 0 64 64" fill="none" stroke="#b9c6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="8" width="40" height="50" rx="6"/><path d="M24 8V4h16v4"/><path d="M22 26h20M22 36h20M22 46h10"/><path d="M40 46l4 4 8-9" stroke="#5271ff" stroke-width="3.5"/></svg>
+        </div>
+      </div>
+      <div class="ssd-day rv" style="--i:3">
+        <h3>The day</h3>
+        <ol>
+          <li><time>08:00</time><strong>Coffee, tea &amp; croissants</strong><span>Outside Nexus</span></li>
+          <li><time>08:00–09:00</time><strong>Morning setup</strong></li>
+          <li class="key"><time>09:00–16:00</time><strong>Booth shifts</strong><span>Five time slots, two volunteers each</span></li>
+          <li><time>16:00–16:30</time><strong>Take-down &amp; clean-up</strong></li>
+          <li class="key"><time>16:30–19:00</time><strong>After-mingle in Nexus</strong><span>Drink tickets handed out at the end of the day</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Closing -->
+    <section class="slide s-close" data-tone="dark" data-chrome="off" aria-label="Glad to have you here">
+      <img class="photo" src="assets/team.jpg" alt="The CBS AI team on stage at AI Day">
+      <div class="shade"></div>
+      <div class="content">
+        <h2 class="rv" style="--i:0">Glad to have you here.</h2>
+        <p class="sub rv" style="--i:1">Questions now, or grab any board member afterwards.</p>
+      </div>
+      <p class="foot rv" style="--i:2"><img src="assets/logo-white.png" alt="">CBS AI · 2026/27</p>
+    </section>
+
+    <div class="chrome-bottom">
+      <span class="counter" id="counter"></span>
+      <button class="nav-btn" id="prev" type="button" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="nav-btn" id="next" type="button" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(stage.querySelectorAll('.slide'));
+  var counter = document.getElementById('counter');
+  var part = document.getElementById('part');
+  var bar = document.getElementById('bar');
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var total = slides.length;
+  var current = -1;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.setProperty('--scale', s);
+  }
+
+  function renderPart(label) {
+    part.textContent = '';
+    if (!label) return;
+    var bits = label.split('|');
+    if (bits.length === 2) {
+      var b = document.createElement('b');
+      b.textContent = bits[0];
+      part.appendChild(b);
+      part.appendChild(document.createTextNode(bits[1]));
+    } else {
+      part.textContent = label;
+    }
+  }
+
+  function go(index) {
+    index = Math.max(0, Math.min(total - 1, index));
+    if (index === current) return;
+    if (current >= 0) slides[current].classList.remove('is-active');
+    current = index;
+    var slide = slides[current];
+    slide.classList.add('is-active');
+    stage.dataset.tone = slide.dataset.tone || 'light';
+    stage.dataset.chrome = slide.dataset.chrome || 'on';
+    renderPart(slide.dataset.part);
+    counter.innerHTML = '<b>' + pad(current + 1) + '</b> / ' + pad(total);
+    bar.style.width = ((current + 1) / total * 100) + '%';
+    prev.disabled = current === 0;
+    next.disabled = current === total - 1;
+    if (history.replaceState) history.replaceState(null, '', '#' + (current + 1));
+  }
+
+  prev.addEventListener('click', function () { go(current - 1); });
+  next.addEventListener('click', function () { go(current + 1); });
+
+  Array.prototype.forEach.call(stage.querySelectorAll('[data-target]'), function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.dataset.target);
+      var i = slides.indexOf(target);
+      if (i >= 0) go(i);
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var onButton = document.activeElement && (document.activeElement.tagName === 'BUTTON' || document.activeElement.tagName === 'A');
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown':
+        e.preventDefault(); go(current + 1); break;
+      case ' ': case 'Enter':
+        if (onButton) return;
+        e.preventDefault(); go(current + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace':
+        e.preventDefault(); go(current - 1); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(total - 1); break;
+      case 'f': case 'F':
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(function () {});
+        } else if (document.exitFullscreen) {
+          document.exitFullscreen().catch(function () {});
+        }
+        break;
+    }
+  });
+
+  var tx = null, ty = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(current + (dx < 0 ? 1 : -1));
+    tx = ty = null;
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function () {
+    var n = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(n)) go(n - 1);
+  });
+
+  // New website link: paste the URL between the quotes when it is ready, e.g. 'https://example.dk'
+  var WEBSITE_URL = '';
+  Array.prototype.forEach.call(stage.querySelectorAll('[data-site-link]'), function (a) {
+    var label = a.querySelector('[data-site-label]');
+    if (WEBSITE_URL) {
+      a.href = WEBSITE_URL;
+      label.textContent = 'Open ' + WEBSITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    } else {
+      a.classList.remove('solid');
+      a.classList.add('pending');
+      a.removeAttribute('href');
+      a.setAttribute('aria-disabled', 'true');
+      label.textContent = 'Link coming soon';
+    }
+  });
+  Array.prototype.forEach.call(stage.querySelectorAll('[data-site-url]'), function (el) {
+    if (WEBSITE_URL) el.textContent = WEBSITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  });
+
+  fit();
+  var start = parseInt(location.hash.slice(1), 10);
+  go(isNaN(start) ? 0 : start - 1);
+})();
+</script>
