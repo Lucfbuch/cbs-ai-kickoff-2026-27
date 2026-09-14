@@ -305,7 +305,9 @@
   .rstep:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -34px; width: 24px; height: 24px; border-top: 4px solid var(--signal); border-right: 4px solid var(--signal); transform: translateY(-50%) rotate(45deg); }
   .loop { position: absolute; left: 120px; right: 120px; top: 830px; height: 180px; }
   .loop svg { width: 100%; height: 100%; display: block; overflow: visible; }
-  .loop path { stroke: var(--signal); stroke-width: 3.5; fill: none; stroke-dasharray: 3 14; stroke-linecap: round; }
+  .loop path { stroke: var(--signal); stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .loop path.curve { stroke-dasharray: 3 14; }
+  .loop path.ah { stroke-width: 4.5; }
   .loop text { font-family: var(--body); font-size: 24px; font-weight: 500; fill: var(--mute); }
 
   /* ================= Expectations ================= */
@@ -743,9 +745,9 @@
       </div>
       <div class="loop rv" style="--i:6" aria-hidden="true">
         <svg viewBox="0 0 1680 180">
-          <path d="M 218 24 C 490 150, 1190 150, 1462 24"/>
-          <path d="M 0 -9 L 18 0 L 0 9 Z" fill="#5271ff" stroke="none" transform="translate(214, 22) rotate(205.6)"/>
-          <path d="M 0 -9 L 18 0 L 0 9 Z" fill="#5271ff" stroke="none" transform="translate(1466, 22) rotate(-25.6)"/>
+          <path class="curve" d="M 252 44 C 500 150, 1180 150, 1428 44"/>
+          <path class="ah" d="M -11 -14 L 5 0 L -11 14" fill="none" transform="translate(228, 30) rotate(203)"/>
+          <path class="ah" d="M -11 -14 L 5 0 L -11 14" fill="none" transform="translate(1452, 30) rotate(-23)"/>
           <text x="840" y="160" text-anchor="middle">Back and forth: Operations briefs Partnerships on what each event needs</text>
         </svg>
       </div>
