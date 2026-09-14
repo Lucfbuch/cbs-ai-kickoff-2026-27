@@ -895,8 +895,9 @@
 
   function fit() {
     var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    stage.style.setProperty('--scale', s);
+    if (s > 0) stage.style.setProperty('--scale', s);
   }
+  document.addEventListener('visibilitychange', fit);
 
   function renderPart(label) {
     part.textContent = '';
