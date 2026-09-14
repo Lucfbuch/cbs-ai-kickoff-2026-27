@@ -262,30 +262,39 @@
   .focus span { font-size: 21px; line-height: 1.4; color: #dfe5ff; }
 
   /* ================= Organization ================= */
+  .s-org { background: #f2f1ee; }
+  .s-org .headline, .s-org .board, .s-org .units { position: relative; z-index: 1; }
+  .s-org .org-stats, .s-org .org-foot { z-index: 1; }
+  .s-org .blob { position: absolute; border-radius: 50%; background: #e6e5f2; z-index: 0; }
+  .s-org .blob.tr { right: -170px; top: -200px; width: 540px; height: 540px; }
+  .s-org .blob.bl { left: -220px; bottom: -300px; width: 680px; height: 680px; }
+  .s-org .headline { color: #23273a; }
+  .s-org .headline .yr { color: var(--navy); }
   .org-stats { position: absolute; right: 120px; top: 178px; display: flex; gap: 18px; }
-  .org-stats .chip { background: var(--white); border: 1.5px solid var(--line); border-radius: 999px; padding: 14px 30px; font-size: 23px; font-weight: 600; color: var(--ink); box-shadow: 0 4px 14px rgba(6,13,51,.05); }
+  .org-stats .chip { background: var(--white); border-radius: 999px; padding: 15px 34px; font-size: 22px; font-weight: 500; color: #3c4256; box-shadow: 0 3px 12px rgba(20,24,60,.06); }
   .board {
-    position: relative; margin-top: 40px;
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: nowrap;
-    background: var(--navy); color: var(--white); border-radius: 20px; padding: 22px 30px;
+    margin-top: 32px;
+    background: var(--navy); color: var(--white); border-radius: 20px; padding: 26px 30px 28px;
   }
-  .board::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 34px; background: var(--line); }
-  .board > h3 { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: .16em; text-transform: uppercase; margin-right: 6px; }
-  .board .seat { display: flex; align-items: baseline; gap: 12px; background: rgba(255,255,255,.09); border: 1.5px solid rgba(185,198,255,.32); border-radius: 999px; padding: 12px 22px; white-space: nowrap; }
-  .board .seat span { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ice); }
-  .board .seat strong { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
-  .units { position: relative; margin-top: 66px; display: grid; grid-template-columns: repeat(5, 1fr) 1.32fr; gap: 26px; align-items: start; }
-  .ucard { position: relative; background: var(--white); border: 1.5px solid var(--line); border-radius: 16px; box-shadow: 0 12px 32px rgba(6,13,51,.07); }
-  .ucard::before { content: ""; position: absolute; left: 50%; top: -34px; width: 2px; height: 34px; background: var(--line); }
-  .ucard::after { content: ""; position: absolute; left: 50%; top: -34px; width: calc(100% + 26px); height: 2px; background: var(--line); }
+  .board::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 20px; background: #ccd3e8; }
+  .board > h3 { font-family: var(--display); font-weight: 700; font-size: 21px; letter-spacing: .24em; text-transform: uppercase; margin: 0 0 20px 8px; }
+  .board .seats { display: flex; justify-content: space-between; gap: 14px; flex-wrap: nowrap; }
+  .board .seat { display: flex; align-items: baseline; gap: 11px; background: rgba(255,255,255,.08); border: 1.5px solid rgba(185,198,255,.35); border-radius: 10px; padding: 13px 22px; white-space: nowrap; }
+  .board .seat span { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #d3ad6a; }
+  .board .seat strong { font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+  .units { position: relative; margin-top: 56px; display: grid; grid-template-columns: repeat(5, 1fr) 1.28fr; gap: 24px; align-items: start; }
+  .ucard { position: relative; background: var(--white); border-radius: 14px; box-shadow: 0 12px 28px rgba(20,24,60,.10); }
+  .ucard::before { content: ""; position: absolute; left: 50%; top: -38px; width: 2px; height: 38px; background: #ccd3e8; }
+  .ucard::after { content: ""; position: absolute; left: 50%; top: -38px; width: calc(100% + 24px); height: 2px; background: #ccd3e8; }
   .ucard:last-child::after { display: none; }
-  .ucard header { background: var(--navy); color: var(--white); text-align: center; padding: 20px 18px 18px; border-radius: 14px 14px 0 0; }
-  .ucard header h3 { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.12; letter-spacing: -0.01em; }
-  .ucard header p { margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--ice); }
-  .ucard ul { list-style: none; margin: 0; padding: 4px 22px 6px; }
-  .ucard li { padding: 9px 0; border-bottom: 1.5px solid var(--line); font-size: 19px; line-height: 1.25; color: var(--ink); }
+  .ucard header { background: var(--navy); color: var(--white); text-align: center; padding: 22px 16px 20px; border-radius: 14px; box-shadow: 0 6px 16px rgba(20,24,60,.18); }
+  .ucard header h3 { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.12; letter-spacing: -0.01em; }
+  .ucard header p { margin-top: 7px; font-size: 16px; font-weight: 500; color: #b7c0e2; }
+  .ucard ul { list-style: none; margin: 0; padding: 8px 22px 10px; }
+  .ucard li { padding: 8px 0; border-bottom: 1.5px solid #e6e9f2; font-size: 20px; line-height: 1.25; color: #2f3442; }
   .ucard li:last-child { border-bottom: 0; }
-  .ucard li small { display: block; font-size: 15px; color: var(--mute); margin-top: 3px; }
+  .ucard li small { display: block; font-size: 15px; color: #8b93a8; margin-top: 3px; }
+  .org-foot { position: absolute; left: 120px; bottom: 66px; font-size: 17px; color: #9aa3b8; }
 
   /* ================= How we build an event ================= */
   .relay { position: absolute; left: 120px; right: 120px; top: 420px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; }
@@ -648,19 +657,23 @@
     </section>
 
     <!-- 03 · Organization -->
-    <section class="slide tone-light s-org" id="s-org" data-tone="light" data-part="03|The team" aria-label="The 2026/27 Organization">
-      <h2 class="headline rv" style="--i:0">The 2026/27 Organization</h2>
+    <section class="slide tone-light s-org" id="s-org" data-tone="light" data-part="03|The team" aria-label="Team Structure 2026/27">
+      <div class="blob tr" aria-hidden="true"></div>
+      <div class="blob bl" aria-hidden="true"></div>
+      <h2 class="headline rv" style="--i:0">Team Structure <span class="yr">2026/27</span></h2>
       <div class="org-stats rv" style="--i:1">
-        <span class="chip">7 Units</span><span class="chip">28 People</span>
+        <span class="chip">7 units</span><span class="chip">28 people</span>
       </div>
 
       <div class="board rv" style="--i:2">
         <h3>Board</h3>
-        <div class="seat"><strong>Nicklas Hampe</strong><span>President</span></div>
-        <div class="seat"><strong>Lucas Buch</strong><span>Vice President</span></div>
-        <div class="seat"><strong>Darina Starodumova</strong><span>Academy</span></div>
-        <div class="seat"><strong>Oskar Bugge</strong><span>Funding</span></div>
-        <div class="seat"><strong>Oskar Bührmann</strong><span>Founder</span></div>
+        <div class="seats">
+          <div class="seat"><strong>Nicklas Hampe</strong><span>President</span></div>
+          <div class="seat"><strong>Lucas Buch</strong><span>Vice President</span></div>
+          <div class="seat"><strong>Darina Starodumova</strong><span>Academy</span></div>
+          <div class="seat"><strong>Oskar Bugge</strong><span>Funding</span></div>
+          <div class="seat"><strong>Oskar Bührmann</strong><span>Founder</span></div>
+        </div>
       </div>
 
       <div class="units">
@@ -695,6 +708,8 @@
           </ul>
         </div>
       </div>
+
+      <p class="org-foot rv" style="--i:9">CBS AI · Team Structure 2026/2027</p>
     </section>
 
     <!-- 03 · How we build an event -->
