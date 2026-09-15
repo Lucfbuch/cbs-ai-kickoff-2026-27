@@ -310,6 +310,26 @@
   .loop path.ah { stroke-width: 4.5; }
   .loop text { font-family: var(--body); font-size: 24px; font-weight: 500; fill: var(--mute); }
 
+  /* ================= Partnerships ================= */
+  .pgrid { position: absolute; left: 120px; right: 120px; top: 375px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch; }
+  .pcard { background: var(--white); border: 2px solid var(--line); border-radius: 26px; padding: 42px 48px 46px; box-shadow: 0 14px 36px rgba(6,13,51,.06); }
+  .pcard h3 { font-family: var(--display); font-weight: 700; font-size: 36px; letter-spacing: -0.02em; color: var(--navy); display: flex; align-items: center; gap: 16px; }
+  .pcard ul { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+  .pcard li { position: relative; padding-left: 36px; font-size: 23px; line-height: 1.42; color: var(--mute); }
+  .pcard li b { color: var(--ink); font-weight: 600; }
+  .pcard li::before { content: ""; position: absolute; left: 0; top: 9px; width: 13px; height: 13px; border-radius: 50%; border: 3px solid var(--signal); background: var(--white); }
+  .pcard.crm { background: var(--navy); border-color: var(--navy); }
+  .pcard.crm h3 { color: var(--white); }
+  .pcard.crm .badge { font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--white); background: var(--signal); padding: 7px 16px; border-radius: 999px; }
+  .pcard.crm li { color: #dfe5ff; }
+  .pcard.crm li b { color: var(--white); }
+  .pcard.crm li::before { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 0 5px rgba(82,113,255,.28); }
+  .pipe { position: absolute; left: 120px; right: 120px; top: 872px; display: flex; align-items: center; gap: 14px; }
+  .pipe .plabel { position: absolute; top: -40px; left: 4px; font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
+  .pipe .pstage { flex: 1; text-align: center; background: var(--white); border: 2px solid var(--line); border-radius: 999px; padding: 15px 8px; font-size: 21px; font-weight: 600; color: var(--ink); }
+  .pipe .pstage.done { background: var(--signal); border-color: var(--signal); color: var(--white); }
+  .pipe i { width: 13px; height: 13px; border-top: 3.5px solid var(--signal); border-right: 3.5px solid var(--signal); transform: rotate(45deg); flex: none; }
+
   /* ================= Expectations ================= */
   .exchange { position: absolute; left: 120px; right: 120px; top: 300px; bottom: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
   .side { border-radius: 28px; padding: 52px 60px; display: flex; flex-direction: column; }
@@ -750,6 +770,38 @@
           <path class="ah" d="M -11 -14 L 5 0 L -11 14" fill="none" transform="translate(1452, 30) rotate(-23)"/>
           <text x="840" y="160" text-anchor="middle">Back and forth: Operations briefs Partnerships on what each event needs</text>
         </svg>
+      </div>
+    </section>
+
+    <!-- 03 · Partnerships -->
+    <section class="slide tone-light s-pship" id="s-pship" data-tone="light" data-part="03|The team" aria-label="Inside Partnerships">
+      <h2 class="headline rv" style="--i:0">Inside Partnerships</h2>
+      <p class="lede rv" style="--i:1; margin-top: 24px">What we build with companies, and the new system that keeps it running.</p>
+      <div class="pgrid">
+        <div class="pcard rv" style="--i:2">
+          <h3>The work</h3>
+          <ul>
+            <li><b>Industry speakers.</b> Practitioners from firms like Microsoft, BCG and Accenture on our stages.</li>
+            <li><b>Sponsorships.</b> The funding and prizes that keep our events free for students.</li>
+            <li><b>Relationships that last.</b> Partners who come back year after year, from SAP to Lovable.</li>
+          </ul>
+        </div>
+        <div class="pcard crm rv" style="--i:3">
+          <h3>Our new CRM <span class="badge">New</span></h3>
+          <ul>
+            <li><b>One shared pipeline.</b> Every company, contact and deal lives in one place.</li>
+            <li><b>Nothing gets lost.</b> Full history on every partner, so handovers keep the context.</li>
+            <li><b>Clear ownership.</b> Every dialogue has an owner and a next step.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pipe rv" style="--i:4" aria-label="CRM pipeline stages">
+        <span class="plabel">How a deal moves in the CRM</span>
+        <div class="pstage">Lead</div><i aria-hidden="true"></i>
+        <div class="pstage">Contacted</div><i aria-hidden="true"></i>
+        <div class="pstage">In dialogue</div><i aria-hidden="true"></i>
+        <div class="pstage">Confirmed</div><i aria-hidden="true"></i>
+        <div class="pstage done">Delivered</div>
       </div>
     </section>
 
