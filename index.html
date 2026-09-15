@@ -326,6 +326,8 @@
   .pcard.crm li { color: #dfe5ff; }
   .pcard.crm li b { color: var(--white); }
   .pcard.crm li::before { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 0 5px rgba(82,113,255,.28); }
+  .pcard.crm .link-btn { margin-top: 30px; font-size: 22px; }
+  .pcard.crm .link-btn.solid:hover { background: var(--white); color: var(--navy); }
   .pipe { position: absolute; left: 120px; right: 120px; top: 872px; display: flex; align-items: center; gap: 14px; }
   .pipe .plabel { position: absolute; top: -40px; left: 4px; font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
   .pipe .pstage { flex: 1; text-align: center; background: var(--white); border: 2px solid var(--line); border-radius: 999px; padding: 15px 8px; font-size: 21px; font-weight: 600; color: var(--ink); }
@@ -796,6 +798,7 @@
             <li><b>Nothing gets lost.</b> Full history on every partner, so handovers keep the context.</li>
             <li><b>Clear ownership.</b> Every dialogue has an owner and a next step.</li>
           </ul>
+          <a class="link-btn solid" href="https://cbs-ai-os.vercel.app/dashboard" target="_blank" rel="noopener">See it live<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
         </div>
       </div>
       <div class="pipe rv" style="--i:5" aria-label="CRM pipeline stages">
