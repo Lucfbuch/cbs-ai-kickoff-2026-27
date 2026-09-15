@@ -330,8 +330,15 @@
   .pcard.crm .link-btn.solid:hover { background: var(--white); color: var(--navy); }
   .pipe { position: absolute; left: 120px; right: 120px; top: 872px; display: flex; align-items: center; gap: 14px; }
   .pipe .plabel { position: absolute; top: -40px; left: 4px; font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--cobalt); }
-  .pipe .pstage { flex: 1; text-align: center; background: var(--white); border: 2px solid var(--line); border-radius: 999px; padding: 15px 8px; font-size: 21px; font-weight: 600; color: var(--ink); }
-  .pipe .pstage.done { background: var(--signal); border-color: var(--signal); color: var(--white); }
+  .pipe .pstage { flex: 1; text-align: center; background: var(--white); border: 2px solid var(--line); border-radius: 18px; padding: 14px 14px 16px; }
+  .pipe .pstage b { display: block; font-size: 22px; font-weight: 600; color: var(--ink); }
+  .pipe .pstage span { display: block; margin-top: 4px; font-size: 16px; line-height: 1.3; color: var(--mute); }
+  .pipe .pstage.done { background: var(--signal); border-color: var(--signal); }
+  .pipe .pstage.done b { color: var(--white); }
+  .pipe .pstage.done span { color: #dfe5ff; }
+  .pipe .pstage.lost { background: transparent; border-style: dashed; }
+  .pipe .pstage.lost b { color: var(--mute); }
+  .pipe .sep { width: 2px; height: 52px; background: var(--line); margin: 0 12px; flex: none; }
   .pipe i { width: 13px; height: 13px; border-top: 3.5px solid var(--signal); border-right: 3.5px solid var(--signal); transform: rotate(45deg); flex: none; }
 
   /* ================= Expectations ================= */
@@ -803,11 +810,11 @@
       </div>
       <div class="pipe rv" style="--i:5" aria-label="CRM pipeline stages">
         <span class="plabel">How a deal moves in the CRM</span>
-        <div class="pstage">Lead</div><i aria-hidden="true"></i>
-        <div class="pstage">Contacted</div><i aria-hidden="true"></i>
-        <div class="pstage">In dialogue</div><i aria-hidden="true"></i>
-        <div class="pstage">Confirmed</div><i aria-hidden="true"></i>
-        <div class="pstage done">Delivered</div>
+        <div class="pstage"><b>New</b><span>Have not worked together yet, maybe talked</span></div><i aria-hidden="true"></i>
+        <div class="pstage"><b>Good terms</b><span>Went fine, would say yes to the next one</span></div><i aria-hidden="true"></i>
+        <div class="pstage done"><b>Working together</b><span>An agreement in place right now</span></div>
+        <div class="sep" aria-hidden="true"></div>
+        <div class="pstage lost"><b>Lost</b><span>Said no, went badly, or the contact left</span></div>
       </div>
     </section>
 
